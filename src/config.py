@@ -1,12 +1,20 @@
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parents[1]
+# Root
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-DATA_DIR = BASE_DIR / "data"
-RAW_DIR = DATA_DIR / "raw"
-PROCESSED_DIR = DATA_DIR / "processed"
-OUTPUTS_DIR = DATA_DIR / "outputs"
+# Data folders
+DATA_DIR = PROJECT_ROOT / "data"
+RAW_DATA_DIR = DATA_DIR / "raw"
+PROCESSED_DATA_DIR = DATA_DIR / "processed"
+DASHBOARD_DATA_DIR = DATA_DIR / "dashboard"
 
-DOCS_DIR = BASE_DIR / "docs"
-NOTEBOOKS_DIR = BASE_DIR / "notebooks"
-APP_DIR = BASE_DIR / "app"
+# Dashboard files
+DASHBOARD_MASTER_POLICY_MEMBER = DASHBOARD_DATA_DIR / "dashboard_master_policy_member.csv"
+DASHBOARD_MASTER_PROVIDER = DASHBOARD_DATA_DIR / "dashboard_master_provider.csv"
+DASHBOARD_MASTER_PROSPECT = DASHBOARD_DATA_DIR / "dashboard_master_prospect.csv"
+DASHBOARD_MASTER_DICTIONARY = DASHBOARD_DATA_DIR / "dashboard_master_dictionary.csv"
+
+# App metadata
+APP_TITLE = "NOVAres SecureHealth"
+APP_SUBTITLE = "Risk scoring · Fraud/abuse · Pricing · Prospect profiler"
