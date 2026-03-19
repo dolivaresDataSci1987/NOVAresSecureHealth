@@ -1,13 +1,8 @@
 # Python
 __pycache__/
-*.py[cod]
+*.pyc
 *.pyo
 *.pyd
-
-# Virtual environments
-.venv/
-venv/
-env/
 
 # Jupyter
 .ipynb_checkpoints/
@@ -18,21 +13,17 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Environments
+.venv/
+venv/
+env/
+
 # Streamlit
 .streamlit/secrets.toml
 
-# Data outputs
-data/processed/*
-data/outputs/*
+# Large local files
+data/processed/claims_analytical_base.csv
 
-# Keep folders
-!data/processed/.gitkeep
-!data/outputs/.gitkeep
-
-# Logs
+# Temporary files
 *.log
-
-# Build artifacts
-dist/
-build/
-*.egg-info/
+*.tmp
