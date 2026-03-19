@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Data outputs
+data/processed/*
+data/outputs/*
+
+# Keep folders
+!data/processed/.gitkeep
+!data/outputs/.gitkeep
+
+# Logs
+*.log
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
