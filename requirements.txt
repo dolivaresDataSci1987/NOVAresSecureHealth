@@ -1,11 +1,3 @@
-
----
-
-# 4) Contenido inicial de `requirements.txt`
-
-Para arrancar sin complicarte:
-
-```txt
 pandas>=2.2.0
 numpy>=1.26.0
 scikit-learn>=1.4.0
