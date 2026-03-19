@@ -1,0 +1,8 @@
+dataset,rows,columns
+insured_members.csv,4000,32
+policies.csv,4000,25
+claims.csv,44144,37
+providers.csv,180,17
+member_year_features.csv,7139,38
+provider_month_features.csv,4263,24
+prospect_survey_synthetic.csv,7000,30
