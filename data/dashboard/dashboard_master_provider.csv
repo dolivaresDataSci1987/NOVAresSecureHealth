@@ -1,0 +1,181 @@
+provider_id,provider_name,provider_type,specialty_group,region,provider_archetype,contract_type,claims_count,claims_n_total,average_claim_expected,provider_quality_proxy,fraud_exposure_score,provider_fraud_score,provider_fraud_severity,provider_fraud_reason,flag_high_claim_volume,flag_high_base_cost_multiplier,flag_high_diagnostic_intensity,flag_high_admission_intensity,flag_high_fraud_exposure,flag_historical_suspicion,flag_high_observed_vs_expected
+PRV00001,Provider 1,Clinic,Pediatrics,Central,Normal,External,363,363,209.3,High,0.177,0,none,none,0,0,0,0,0,0,0
+PRV00002,Provider 2,Specialist Center,Pulmonology,Asunción,Normal,Standard,168,168,258.15,Medium,0.238,0,none,none,0,0,0,0,0,0,0
+PRV00003,Provider 3,Pharmacy,Pharmacy,Asunción,High Complexity,Standard,89,89,319.41,Medium,0.252,0,none,none,0,0,0,0,0,0,0
+PRV00004,Provider 4,Lab,Laboratory,Alto Paraná,Suspicious,Standard,94,94,432.7,Medium,0.869,3,high,high_base_cost_multiplier; high_fraud_exposure; historical_suspicion,0,1,0,0,1,1,0
+PRV00005,Provider 5,Hospital,Orthopedics,Alto Paraná,Normal,Standard,344,344,227.29,Medium,0.227,0,none,none,0,0,0,0,0,0,0
+PRV00006,Provider 6,Hospital,General Medicine,Asunción,Expensive,External,346,346,288.52,High,0.28,0,none,none,0,0,0,0,0,0,0
+PRV00007,Provider 7,Hospital,General Medicine,Paraguarí,Suspicious,Preferred,342,342,379.88,Medium,0.825,3,high,high_base_cost_multiplier; high_fraud_exposure; historical_suspicion,0,1,0,0,1,1,0
+PRV00008,Provider 8,Pharmacy,Pharmacy,Cordillera,Normal,Preferred,85,85,289.73,Medium,0.192,0,none,none,0,0,0,0,0,0,0
+PRV00009,Provider 9,Lab,Laboratory,Asunción,Normal,Standard,73,73,206.56,Medium,0.229,0,none,none,0,0,0,0,0,0,0
+PRV00010,Provider 10,Imaging,Radiology,Paraguarí,Normal,Preferred,75,75,176.95,Medium,0.149,0,none,none,0,0,0,0,0,0,0
+PRV00011,Provider 11,Hospital,General Medicine,San Pedro,Normal,External,346,346,199.5,Medium,0.176,0,none,none,0,0,0,0,0,0,0
+PRV00012,Provider 12,Specialist Center,Pulmonology,San Pedro,High Complexity,Standard,164,164,373.25,Medium,0.274,0,none,none,0,0,0,0,0,0,0
+PRV00013,Provider 13,Pharmacy,Pharmacy,Asunción,High Complexity,External,102,102,337.06,High,0.277,0,none,none,0,0,0,0,0,0,0
+PRV00014,Provider 14,Clinic,Gynecology,Itapúa,Expensive,Standard,395,395,298.75,Medium,0.355,0,none,none,0,0,0,0,0,0,0
+PRV00015,Provider 15,Clinic,General Medicine,Alto Paraná,Normal,Standard,382,382,187.41,Medium,0.176,0,none,none,0,0,0,0,0,0,0
+PRV00016,Provider 16,Clinic,Cardiology,Itapúa,Normal,External,390,390,222.48,Medium,0.174,0,none,none,0,0,0,0,0,0,0
+PRV00017,Provider 17,Clinic,Gynecology,San Pedro,Expensive,Standard,413,413,273.06,Low,0.337,0,none,none,0,0,0,0,0,0,0
+PRV00018,Provider 18,Lab,Laboratory,Itapúa,High Complexity,External,86,86,395.75,Medium,0.291,0,none,none,0,0,0,0,0,0,0
+PRV00019,Provider 19,Clinic,General Medicine,Cordillera,High Complexity,Preferred,406,406,363.29,Medium,0.284,0,none,none,0,0,0,0,0,0,0
+PRV00020,Provider 20,Clinic,General Medicine,Caaguazú,Expensive,Standard,379,379,260.48,High,0.382,1,low,high_fraud_exposure,0,0,0,0,1,0,0
+PRV00021,Provider 21,Lab,Laboratory,Cordillera,Expensive,Standard,89,89,215.56,Medium,0.286,0,none,none,0,0,0,0,0,0,0
+PRV00022,Provider 22,Hospital,Orthopedics,Central,Normal,Standard,354,354,173.56,High,0.22,0,none,none,0,0,0,0,0,0,0
+PRV00023,Provider 23,Clinic,Pediatrics,Central,Normal,Preferred,435,435,230.22,High,0.221,1,low,high_claim_volume,1,0,0,0,0,0,0
+PRV00024,Provider 24,Clinic,Gynecology,Central,High Complexity,External,444,444,309.3,High,0.254,1,low,high_claim_volume,1,0,0,0,0,0,0
+PRV00025,Provider 25,Clinic,Cardiology,Caaguazú,Expensive,External,410,410,298.37,Medium,0.336,0,none,none,0,0,0,0,0,0,0
+PRV00026,Provider 26,Pharmacy,Pharmacy,Asunción,Normal,External,121,121,209.1,Medium,0.173,0,none,none,0,0,0,0,0,0,0
+PRV00027,Provider 27,Clinic,General Medicine,Central,Normal,Preferred,406,406,188.11,Medium,0.146,0,none,none,0,0,0,0,0,0,0
+PRV00028,Provider 28,Lab,Laboratory,Central,Expensive,Standard,70,70,227.48,High,0.328,0,none,none,0,0,0,0,0,0,0
+PRV00029,Provider 29,Lab,Laboratory,Alto Paraná,Normal,Standard,79,79,161.37,Medium,0.125,0,none,none,0,0,0,0,0,0,0
+PRV00030,Provider 30,Hospital,General Medicine,Caaguazú,Normal,Standard,368,368,267.02,Medium,0.153,0,none,none,0,0,0,0,0,0,0
+PRV00031,Provider 31,Lab,Laboratory,Caaguazú,Normal,Standard,83,83,185.87,Medium,0.218,0,none,none,0,0,0,0,0,0,0
+PRV00032,Provider 32,Hospital,Orthopedics,Central,Expensive,Standard,344,344,327.0,Medium,0.314,0,none,none,0,0,0,0,0,0,0
+PRV00033,Provider 33,Hospital,Internal Medicine,Paraguarí,Expensive,Standard,372,372,383.96,High,0.378,0,none,none,0,0,0,0,0,0,0
+PRV00034,Provider 34,Specialist Center,Endocrinology,Alto Paraná,Normal,Standard,175,175,229.27,High,0.184,0,none,none,0,0,0,0,0,0,0
+PRV00035,Provider 35,Specialist Center,Endocrinology,Central,Expensive,Standard,166,166,317.82,Medium,0.386,1,low,high_fraud_exposure,0,0,0,0,1,0,0
+PRV00036,Provider 36,Pharmacy,Pharmacy,Itapúa,Normal,Preferred,107,107,200.48,Medium,0.189,0,none,none,0,0,0,0,0,0,0
+PRV00037,Provider 37,Clinic,General Medicine,Central,Normal,Preferred,442,442,291.68,Medium,0.124,1,low,high_claim_volume,1,0,0,0,0,0,0
+PRV00038,Provider 38,Hospital,Internal Medicine,Central,Expensive,Preferred,351,351,251.86,Low,0.361,0,none,none,0,0,0,0,0,0,0
+PRV00039,Provider 39,Imaging,Radiology,Itapúa,Expensive,External,71,71,243.27,Low,0.285,0,none,none,0,0,0,0,0,0,0
+PRV00040,Provider 40,Clinic,Pediatrics,Central,Suspicious,Preferred,404,404,385.47,High,0.874,2,medium,high_fraud_exposure; historical_suspicion,0,0,0,0,1,1,0
+PRV00041,Provider 41,Hospital,Internal Medicine,Central,Expensive,Preferred,369,369,393.38,Medium,0.392,1,low,high_fraud_exposure,0,0,0,0,1,0,0
+PRV00042,Provider 42,Lab,Laboratory,Central,Normal,Standard,86,86,277.16,Medium,0.14,0,none,none,0,0,0,0,0,0,0
+PRV00043,Provider 43,Hospital,Internal Medicine,Central,Normal,Standard,320,320,159.76,High,0.167,0,none,none,0,0,0,0,0,0,0
+PRV00044,Provider 44,Specialist Center,Cardiology,Central,Normal,External,181,181,192.88,Medium,0.208,0,none,none,0,0,0,0,0,0,0
+PRV00045,Provider 45,Clinic,Pediatrics,Alto Paraná,Normal,Standard,405,405,315.54,Medium,0.226,0,none,none,0,0,0,0,0,0,0
+PRV00046,Provider 46,Imaging,Radiology,Itapúa,Normal,Standard,80,80,179.1,High,0.201,0,none,none,0,0,0,0,0,0,0
+PRV00047,Provider 47,Clinic,Cardiology,Cordillera,High Complexity,Standard,409,409,315.42,Medium,0.251,0,none,none,0,0,0,0,0,0,0
+PRV00048,Provider 48,Lab,Laboratory,Cordillera,Normal,Preferred,78,78,287.67,High,0.201,0,none,none,0,0,0,0,0,0,0
+PRV00049,Provider 49,Lab,Laboratory,Itapúa,High Complexity,External,89,89,385.05,High,0.256,1,low,high_base_cost_multiplier,0,1,0,0,0,0,0
+PRV00050,Provider 50,Clinic,General Medicine,Itapúa,Expensive,Standard,418,418,267.27,High,0.366,0,none,none,0,0,0,0,0,0,0
+PRV00051,Provider 51,Specialist Center,Endocrinology,Central,Expensive,Standard,182,182,286.02,Medium,0.394,1,low,high_fraud_exposure,0,0,0,0,1,0,0
+PRV00052,Provider 52,Pharmacy,Pharmacy,Central,Normal,Standard,118,118,168.89,Medium,0.207,0,none,none,0,0,0,0,0,0,0
+PRV00053,Provider 53,Specialist Center,Endocrinology,Central,Normal,Standard,175,175,268.62,Medium,0.224,0,none,none,0,0,0,0,0,0,0
+PRV00054,Provider 54,Pharmacy,Pharmacy,Asunción,Normal,Standard,98,98,234.04,High,0.12,0,none,none,0,0,0,0,0,0,0
+PRV00055,Provider 55,Lab,Laboratory,Alto Paraná,Normal,External,76,76,254.35,High,0.206,0,none,none,0,0,0,0,0,0,0
+PRV00056,Provider 56,Specialist Center,Endocrinology,Central,Expensive,External,179,179,251.3,Medium,0.38,0,none,none,0,0,0,0,0,0,0
+PRV00057,Provider 57,Hospital,Surgery,Cordillera,Normal,Standard,365,365,288.93,Medium,0.125,0,none,none,0,0,0,0,0,0,0
+PRV00058,Provider 58,Clinic,Pediatrics,San Pedro,Normal,Standard,407,407,223.05,Medium,0.225,0,none,none,0,0,0,0,0,0,0
+PRV00059,Provider 59,Hospital,Internal Medicine,Alto Paraná,Expensive,Preferred,366,366,214.12,Low,0.311,0,none,none,0,0,0,0,0,0,0
+PRV00060,Provider 60,Clinic,General Medicine,Central,Normal,Standard,427,427,159.89,Medium,0.2,1,low,high_claim_volume,1,0,0,0,0,0,0
+PRV00061,Provider 61,Clinic,Gynecology,Asunción,High Complexity,Preferred,410,410,303.84,Medium,0.316,0,none,none,0,0,0,0,0,0,0
+PRV00062,Provider 62,Clinic,Cardiology,Paraguarí,High Complexity,Standard,411,411,346.19,High,0.3,0,none,none,0,0,0,0,0,0,0
+PRV00063,Provider 63,Pharmacy,Pharmacy,Paraguarí,High Complexity,External,95,95,450.86,Medium,0.231,1,low,high_base_cost_multiplier,0,1,0,0,0,0,0
+PRV00064,Provider 64,Clinic,Pediatrics,Central,Normal,Standard,407,407,159.81,Medium,0.192,0,none,none,0,0,0,0,0,0,0
+PRV00065,Provider 65,Clinic,General Medicine,Itapúa,Normal,Standard,379,379,154.01,Medium,0.186,0,none,none,0,0,0,0,0,0,0
+PRV00066,Provider 66,Lab,Laboratory,Asunción,High Complexity,Standard,82,82,368.07,Medium,0.328,1,low,high_base_cost_multiplier,0,1,0,0,0,0,0
+PRV00067,Provider 67,Hospital,Surgery,Asunción,Normal,Preferred,354,354,213.17,Medium,0.169,0,none,none,0,0,0,0,0,0,0
+PRV00068,Provider 68,Pharmacy,Pharmacy,Asunción,High Complexity,Standard,115,115,360.67,Medium,0.259,1,low,high_base_cost_multiplier,0,1,0,0,0,0,0
+PRV00069,Provider 69,Hospital,General Medicine,Central,High Complexity,Preferred,374,374,374.02,High,0.31,0,none,none,0,0,0,0,0,0,0
+PRV00070,Provider 70,Specialist Center,Pulmonology,San Pedro,Suspicious,Preferred,173,173,639.82,High,0.87,3,high,high_base_cost_multiplier; high_fraud_exposure; historical_suspicion,0,1,0,0,1,1,0
+PRV00071,Provider 71,Pharmacy,Pharmacy,Itapúa,Normal,Standard,99,99,246.52,Medium,0.198,0,none,none,0,0,0,0,0,0,0
+PRV00072,Provider 72,Clinic,General Medicine,Central,Normal,Standard,391,391,257.2,Low,0.198,0,none,none,0,0,0,0,0,0,0
+PRV00073,Provider 73,Hospital,Orthopedics,Itapúa,Suspicious,Standard,323,323,347.45,Medium,0.927,3,high,high_base_cost_multiplier; high_fraud_exposure; historical_suspicion,0,1,0,0,1,1,0
+PRV00074,Provider 74,Pharmacy,Pharmacy,Paraguarí,Normal,Preferred,117,117,189.57,Medium,0.192,0,none,none,0,0,0,0,0,0,0
+PRV00075,Provider 75,Imaging,Radiology,San Pedro,Normal,Standard,60,60,219.26,Medium,0.18,0,none,none,0,0,0,0,0,0,0
+PRV00076,Provider 76,Pharmacy,Pharmacy,Asunción,Normal,Standard,110,110,260.15,Low,0.137,0,none,none,0,0,0,0,0,0,0
+PRV00077,Provider 77,Pharmacy,Pharmacy,Central,High Complexity,Standard,115,115,241.1,Medium,0.234,0,none,none,0,0,0,0,0,0,0
+PRV00078,Provider 78,Hospital,Orthopedics,Asunción,Expensive,Standard,345,345,308.46,Medium,0.299,0,none,none,0,0,0,0,0,0,0
+PRV00079,Provider 79,Clinic,General Medicine,Central,Normal,Standard,392,392,167.72,Medium,0.141,0,none,none,0,0,0,0,0,0,0
+PRV00080,Provider 80,Hospital,General Medicine,Asunción,Normal,Standard,352,352,197.96,High,0.197,0,none,none,0,0,0,0,0,0,0
+PRV00081,Provider 81,Pharmacy,Pharmacy,Alto Paraná,Expensive,Standard,108,108,315.78,Low,0.369,0,none,none,0,0,0,0,0,0,0
+PRV00082,Provider 82,Imaging,Radiology,Central,High Complexity,External,71,71,421.24,Low,0.284,1,low,high_base_cost_multiplier,0,1,0,0,0,0,0
+PRV00083,Provider 83,Clinic,General Medicine,Central,Normal,Standard,400,400,165.06,Medium,0.219,0,none,none,0,0,0,0,0,0,0
+PRV00084,Provider 84,Hospital,General Medicine,Central,Normal,Standard,383,383,284.13,High,0.239,0,none,none,0,0,0,0,0,0,0
+PRV00085,Provider 85,Clinic,Cardiology,Central,Suspicious,Standard,384,384,443.63,Medium,0.918,3,high,high_base_cost_multiplier; high_fraud_exposure; historical_suspicion,0,1,0,0,1,1,0
+PRV00086,Provider 86,Clinic,Pediatrics,Central,Expensive,Standard,403,403,198.43,Medium,0.363,0,none,none,0,0,0,0,0,0,0
+PRV00087,Provider 87,Pharmacy,Pharmacy,Central,Expensive,Standard,110,110,277.76,Low,0.344,0,none,none,0,0,0,0,0,0,0
+PRV00088,Provider 88,Imaging,Radiology,Asunción,Expensive,Standard,67,67,218.8,High,0.334,0,none,none,0,0,0,0,0,0,0
+PRV00089,Provider 89,Pharmacy,Pharmacy,Central,Normal,Standard,124,124,172.3,Medium,0.13,0,none,none,0,0,0,0,0,0,0
+PRV00090,Provider 90,Lab,Laboratory,Central,Normal,Standard,85,85,274.28,High,0.168,0,none,none,0,0,0,0,0,0,0
+PRV00091,Provider 91,Hospital,General Medicine,Alto Paraná,Suspicious,Standard,347,347,374.74,High,0.929,3,high,high_base_cost_multiplier; high_fraud_exposure; historical_suspicion,0,1,0,0,1,1,0
+PRV00092,Provider 92,Imaging,Radiology,Central,Suspicious,Standard,79,79,398.8,Medium,0.917,2,medium,high_fraud_exposure; historical_suspicion,0,0,0,0,1,1,0
+PRV00093,Provider 93,Pharmacy,Pharmacy,Asunción,Suspicious,External,88,88,306.71,High,0.846,2,medium,high_fraud_exposure; historical_suspicion,0,0,0,0,1,1,0
+PRV00094,Provider 94,Lab,Laboratory,Asunción,High Complexity,Standard,67,67,322.29,Low,0.276,1,low,high_base_cost_multiplier,0,1,0,0,0,0,0
+PRV00095,Provider 95,Pharmacy,Pharmacy,Paraguarí,Normal,Standard,119,119,238.01,High,0.218,0,none,none,0,0,0,0,0,0,0
+PRV00096,Provider 96,Lab,Laboratory,Central,Normal,External,87,87,183.99,Medium,0.128,0,none,none,0,0,0,0,0,0,0
+PRV00097,Provider 97,Lab,Laboratory,Alto Paraná,Expensive,Preferred,73,73,319.36,High,0.326,0,none,none,0,0,0,0,0,0,0
+PRV00098,Provider 98,Clinic,General Medicine,Paraguarí,Expensive,Preferred,408,408,392.54,Low,0.382,1,low,high_fraud_exposure,0,0,0,0,1,0,0
+PRV00099,Provider 99,Hospital,Orthopedics,Asunción,Expensive,Standard,334,334,291.73,Medium,0.328,0,none,none,0,0,0,0,0,0,0
+PRV00100,Provider 100,Hospital,Orthopedics,Caaguazú,Expensive,External,347,347,317.21,Medium,0.289,0,none,none,0,0,0,0,0,0,0
+PRV00101,Provider 101,Hospital,Internal Medicine,Alto Paraná,High Complexity,Preferred,332,332,229.74,Medium,0.285,0,none,none,0,0,0,0,0,0,0
+PRV00102,Provider 102,Imaging,Radiology,Asunción,Normal,Preferred,68,68,164.06,Medium,0.223,0,none,none,0,0,0,0,0,0,0
+PRV00103,Provider 103,Clinic,General Medicine,Central,Normal,Preferred,420,420,189.7,Medium,0.191,0,none,none,0,0,0,0,0,0,0
+PRV00104,Provider 104,Lab,Laboratory,Cordillera,Normal,Preferred,74,74,219.57,Medium,0.147,0,none,none,0,0,0,0,0,0,0
+PRV00105,Provider 105,Specialist Center,Pulmonology,Central,Normal,Preferred,183,183,185.43,Medium,0.166,0,none,none,0,0,0,0,0,0,0
+PRV00106,Provider 106,Clinic,Cardiology,San Pedro,Normal,Standard,385,385,206.62,High,0.174,0,none,none,0,0,0,0,0,0,0
+PRV00107,Provider 107,Clinic,Cardiology,Central,Normal,Standard,424,424,200.96,Medium,0.19,1,low,high_claim_volume,1,0,0,0,0,0,0
+PRV00108,Provider 108,Pharmacy,Pharmacy,Itapúa,Normal,Standard,82,82,188.33,Low,0.211,0,none,none,0,0,0,0,0,0,0
+PRV00109,Provider 109,Clinic,Pediatrics,Central,Normal,Standard,421,421,192.85,Medium,0.132,0,none,none,0,0,0,0,0,0,0
+PRV00110,Provider 110,Hospital,General Medicine,Cordillera,Normal,Preferred,320,320,201.38,Low,0.227,0,none,none,0,0,0,0,0,0,0
+PRV00111,Provider 111,Clinic,Gynecology,Alto Paraná,Normal,Standard,397,397,273.61,High,0.121,0,none,none,0,0,0,0,0,0,0
+PRV00112,Provider 112,Hospital,Orthopedics,Asunción,Normal,Standard,357,357,235.83,Medium,0.164,0,none,none,0,0,0,0,0,0,0
+PRV00113,Provider 113,Specialist Center,Neurology,Asunción,Suspicious,Standard,173,173,394.34,Medium,0.823,3,high,high_base_cost_multiplier; high_fraud_exposure; historical_suspicion,0,1,0,0,1,1,0
+PRV00114,Provider 114,Pharmacy,Pharmacy,Asunción,Normal,Preferred,100,100,172.9,High,0.167,0,none,none,0,0,0,0,0,0,0
+PRV00115,Provider 115,Imaging,Radiology,Asunción,Normal,Standard,70,70,312.04,High,0.183,0,none,none,0,0,0,0,0,0,0
+PRV00116,Provider 116,Pharmacy,Pharmacy,Asunción,Normal,Standard,100,100,269.9,Medium,0.181,0,none,none,0,0,0,0,0,0,0
+PRV00117,Provider 117,Pharmacy,Pharmacy,Itapúa,Expensive,External,116,116,276.18,High,0.3,0,none,none,0,0,0,0,0,0,0
+PRV00118,Provider 118,Clinic,Gynecology,Alto Paraná,Normal,Standard,427,427,261.86,High,0.197,1,low,high_claim_volume,1,0,0,0,0,0,0
+PRV00119,Provider 119,Pharmacy,Pharmacy,Itapúa,Expensive,Standard,101,101,261.22,Medium,0.285,0,none,none,0,0,0,0,0,0,0
+PRV00120,Provider 120,Lab,Laboratory,Paraguarí,Normal,Standard,84,84,234.69,Medium,0.211,0,none,none,0,0,0,0,0,0,0
+PRV00121,Provider 121,Pharmacy,Pharmacy,Alto Paraná,Normal,External,108,108,246.12,Medium,0.234,0,none,none,0,0,0,0,0,0,0
+PRV00122,Provider 122,Pharmacy,Pharmacy,Itapúa,Normal,Preferred,95,95,206.05,Medium,0.161,0,none,none,0,0,0,0,0,0,0
+PRV00123,Provider 123,Clinic,Pediatrics,Itapúa,Normal,Preferred,403,403,324.36,Medium,0.182,0,none,none,0,0,0,0,0,0,0
+PRV00124,Provider 124,Hospital,Orthopedics,Central,Expensive,Standard,342,342,331.05,Medium,0.325,0,none,none,0,0,0,0,0,0,0
+PRV00125,Provider 125,Clinic,General Medicine,Central,Expensive,Preferred,372,372,365.08,Medium,0.281,0,none,none,0,0,0,0,0,0,0
+PRV00126,Provider 126,Clinic,Cardiology,Asunción,High Complexity,External,400,400,319.92,Medium,0.266,1,low,high_base_cost_multiplier,0,1,0,0,0,0,0
+PRV00127,Provider 127,Pharmacy,Pharmacy,Central,Normal,Standard,123,123,165.12,Low,0.215,0,none,none,0,0,0,0,0,0,0
+PRV00128,Provider 128,Pharmacy,Pharmacy,Central,Normal,Standard,94,94,222.19,Medium,0.192,0,none,none,0,0,0,0,0,0,0
+PRV00129,Provider 129,Hospital,General Medicine,Asunción,Expensive,Standard,334,334,388.66,Low,0.292,0,none,none,0,0,0,0,0,0,0
+PRV00130,Provider 130,Lab,Laboratory,Caaguazú,Normal,External,70,70,185.24,Medium,0.222,0,none,none,0,0,0,0,0,0,0
+PRV00131,Provider 131,Clinic,Gynecology,Itapúa,Normal,External,423,423,255.89,Medium,0.184,0,none,none,0,0,0,0,0,0,0
+PRV00132,Provider 132,Clinic,General Medicine,Asunción,Normal,Standard,371,371,268.63,High,0.221,0,none,none,0,0,0,0,0,0,0
+PRV00133,Provider 133,Hospital,Internal Medicine,Central,Normal,External,367,367,205.73,Low,0.19,0,none,none,0,0,0,0,0,0,0
+PRV00134,Provider 134,Clinic,General Medicine,Asunción,High Complexity,External,410,410,356.98,Medium,0.287,0,none,none,0,0,0,0,0,0,0
+PRV00135,Provider 135,Specialist Center,Pulmonology,Central,Suspicious,Standard,159,159,286.0,Medium,0.833,3,high,high_base_cost_multiplier; high_fraud_exposure; historical_suspicion,0,1,0,0,1,1,0
+PRV00136,Provider 136,Clinic,General Medicine,Central,Expensive,Preferred,389,389,305.27,Medium,0.3,0,none,none,0,0,0,0,0,0,0
+PRV00137,Provider 137,Lab,Laboratory,Cordillera,Normal,Standard,87,87,228.6,Low,0.237,0,none,none,0,0,0,0,0,0,0
+PRV00138,Provider 138,Imaging,Radiology,Central,Normal,External,118,118,183.43,High,0.147,0,none,none,0,0,0,0,0,0,0
+PRV00139,Provider 139,Clinic,Pediatrics,Cordillera,Normal,Preferred,427,427,192.03,High,0.237,1,low,high_claim_volume,1,0,0,0,0,0,0
+PRV00140,Provider 140,Specialist Center,Cardiology,San Pedro,Normal,External,182,182,208.24,Medium,0.184,0,none,none,0,0,0,0,0,0,0
+PRV00141,Provider 141,Specialist Center,Cardiology,Asunción,Normal,Preferred,158,158,224.65,Medium,0.136,0,none,none,0,0,0,0,0,0,0
+PRV00142,Provider 142,Clinic,Pediatrics,Cordillera,Expensive,Preferred,389,389,372.27,High,0.292,0,none,none,0,0,0,0,0,0,0
+PRV00143,Provider 143,Lab,Laboratory,Alto Paraná,Expensive,Standard,61,61,301.42,Medium,0.305,0,none,none,0,0,0,0,0,0,0
+PRV00144,Provider 144,Clinic,Cardiology,Central,Normal,Preferred,443,443,215.46,Medium,0.231,1,low,high_claim_volume,1,0,0,0,0,0,0
+PRV00145,Provider 145,Clinic,Cardiology,Central,High Complexity,External,434,434,270.56,High,0.27,1,low,high_claim_volume,1,0,0,0,0,0,0
+PRV00146,Provider 146,Hospital,General Medicine,Cordillera,Expensive,External,322,322,215.58,Medium,0.327,0,none,none,0,0,0,0,0,0,0
+PRV00147,Provider 147,Lab,Laboratory,Alto Paraná,Normal,Standard,80,80,221.7,Medium,0.158,0,none,none,0,0,0,0,0,0,0
+PRV00148,Provider 148,Lab,Laboratory,Cordillera,Expensive,Standard,77,77,313.15,Medium,0.298,0,none,none,0,0,0,0,0,0,0
+PRV00149,Provider 149,Hospital,Surgery,Paraguarí,Normal,Preferred,370,370,220.24,High,0.179,0,none,none,0,0,0,0,0,0,0
+PRV00150,Provider 150,Clinic,General Medicine,Alto Paraná,Normal,Standard,424,424,173.28,Medium,0.136,1,low,high_claim_volume,1,0,0,0,0,0,0
+PRV00151,Provider 151,Specialist Center,Pulmonology,San Pedro,Normal,Standard,171,171,247.51,Medium,0.22,0,none,none,0,0,0,0,0,0,0
+PRV00152,Provider 152,Clinic,Gynecology,Alto Paraná,Expensive,Standard,423,423,339.02,Medium,0.324,0,none,none,0,0,0,0,0,0,0
+PRV00153,Provider 153,Hospital,General Medicine,Alto Paraná,Normal,Standard,365,365,276.58,Medium,0.165,0,none,none,0,0,0,0,0,0,0
+PRV00154,Provider 154,Lab,Laboratory,Alto Paraná,Normal,Standard,72,72,281.88,Medium,0.177,0,none,none,0,0,0,0,0,0,0
+PRV00155,Provider 155,Specialist Center,Neurology,Asunción,Normal,Standard,187,187,193.79,Medium,0.173,0,none,none,0,0,0,0,0,0,0
+PRV00156,Provider 156,Clinic,Cardiology,Itapúa,Normal,External,404,404,206.44,Medium,0.239,0,none,none,0,0,0,0,0,0,0
+PRV00157,Provider 157,Imaging,Radiology,Alto Paraná,Suspicious,External,94,94,520.4,Low,0.885,3,high,high_base_cost_multiplier; high_fraud_exposure; historical_suspicion,0,1,0,0,1,1,0
+PRV00158,Provider 158,Pharmacy,Pharmacy,Central,Expensive,Standard,121,121,406.99,High,0.291,1,low,high_base_cost_multiplier,0,1,0,0,0,0,0
+PRV00159,Provider 159,Clinic,General Medicine,Paraguarí,Normal,Standard,424,424,190.85,Low,0.193,1,low,high_claim_volume,1,0,0,0,0,0,0
+PRV00160,Provider 160,Pharmacy,Pharmacy,Central,Normal,Standard,101,101,250.61,High,0.138,0,none,none,0,0,0,0,0,0,0
+PRV00161,Provider 161,Clinic,General Medicine,Alto Paraná,Normal,Preferred,394,394,290.17,Low,0.124,0,none,none,0,0,0,0,0,0,0
+PRV00162,Provider 162,Imaging,Radiology,Itapúa,Normal,External,71,71,204.93,Medium,0.236,0,none,none,0,0,0,0,0,0,0
+PRV00163,Provider 163,Imaging,Radiology,Cordillera,Normal,External,71,71,268.1,Low,0.213,0,none,none,0,0,0,0,0,0,0
+PRV00164,Provider 164,Lab,Laboratory,Central,Normal,Standard,93,93,212.24,High,0.238,0,none,none,0,0,0,0,0,0,0
+PRV00165,Provider 165,Hospital,Internal Medicine,Caaguazú,Normal,Standard,383,383,208.68,Medium,0.177,0,none,none,0,0,0,0,0,0,0
+PRV00166,Provider 166,Pharmacy,Pharmacy,Cordillera,Expensive,Standard,107,107,264.46,Medium,0.344,0,none,none,0,0,0,0,0,0,0
+PRV00167,Provider 167,Clinic,Cardiology,Asunción,Expensive,Standard,405,405,332.26,Medium,0.3,0,none,none,0,0,0,0,0,0,0
+PRV00168,Provider 168,Clinic,General Medicine,Asunción,Normal,Preferred,399,399,221.68,Medium,0.15,0,none,none,0,0,0,0,0,0,0
+PRV00169,Provider 169,Hospital,Internal Medicine,Alto Paraná,Normal,External,367,367,249.74,Medium,0.221,0,none,none,0,0,0,0,0,0,0
+PRV00170,Provider 170,Lab,Laboratory,Central,Expensive,Preferred,75,75,229.84,High,0.323,0,none,none,0,0,0,0,0,0,0
+PRV00171,Provider 171,Imaging,Radiology,Asunción,Normal,Standard,85,85,240.42,Medium,0.219,0,none,none,0,0,0,0,0,0,0
+PRV00172,Provider 172,Hospital,Orthopedics,Alto Paraná,Suspicious,External,357,357,516.0,High,0.905,3,high,high_base_cost_multiplier; high_fraud_exposure; historical_suspicion,0,1,0,0,1,1,0
+PRV00173,Provider 173,Lab,Laboratory,Central,Expensive,Standard,81,81,373.98,Medium,0.301,0,none,none,0,0,0,0,0,0,0
+PRV00174,Provider 174,Clinic,Pediatrics,Alto Paraná,Normal,Standard,400,400,276.34,Medium,0.181,0,none,none,0,0,0,0,0,0,0
+PRV00175,Provider 175,Imaging,Radiology,Central,Normal,Standard,70,70,265.85,Medium,0.201,0,none,none,0,0,0,0,0,0,0
+PRV00176,Provider 176,Hospital,Internal Medicine,Alto Paraná,Expensive,Preferred,373,373,231.81,Medium,0.308,0,none,none,0,0,0,0,0,0,0
+PRV00177,Provider 177,Imaging,Radiology,Central,Normal,Standard,80,80,207.85,High,0.22,0,none,none,0,0,0,0,0,0,0
+PRV00178,Provider 178,Clinic,Cardiology,Itapúa,Normal,Preferred,381,381,172.98,High,0.185,0,none,none,0,0,0,0,0,0,0
+PRV00179,Provider 179,Specialist Center,Neurology,Asunción,High Complexity,Standard,176,176,286.5,Medium,0.24,0,none,none,0,0,0,0,0,0,0
+PRV00180,Provider 180,Hospital,Internal Medicine,Itapúa,Normal,External,399,399,234.56,Medium,0.19,0,none,none,0,0,0,0,0,0,0
