@@ -18,16 +18,28 @@ def _read_csv_safe(path: Path, dataset_name: str) -> pd.DataFrame:
 
 
 def load_policy_member_master() -> pd.DataFrame:
-    return _read_csv_safe(DASHBOARD_MASTER_POLICY_MEMBER, "dashboard_master_policy_member.csv")
+    return _read_csv_safe(
+        DASHBOARD_MASTER_POLICY_MEMBER,
+        "dashboard_master_policy_member.csv"
+    )
 
 
 def load_provider_master() -> pd.DataFrame:
-    return _read_csv_safe(DASHBOARD_MASTER_PROVIDER, "dashboard_master_provider.csv")
+    return _read_csv_safe(
+        DASHBOARD_MASTER_PROVIDER,
+        "dashboard_master_provider.csv"
+    )
 
 
 def load_prospect_master() -> pd.DataFrame:
-    return _read_csv_safe(DASHBOARD_MASTER_PROSPECT, "dashboard_master_prospect.csv")
+    return _read_csv_safe(
+        DASHBOARD_MASTER_PROSPECT,
+        "dashboard_master_prospect.csv"
+    )
 
 
 def load_dictionary() -> pd.DataFrame:
-    return _read_csv_safe(DASHBOARD_MASTER_DICTIONARY, "dashboard_master_dictionary.csv")
+    return _read_csv_safe(
+        DASHBOARD_MASTER_DICTIONARY,
+        "dashboard_master_dictionary.csv"
+    )
