@@ -43,19 +43,23 @@ def get_prospect():
 # =========================================================
 # HELPERS
 # =========================================================
-def safe_numeric_mean(df: pd.DataFrame, col: str):
+def safe_numeric(series):
+    return pd.to_numeric(series, errors="coerce")
+
+
+def safe_mean(df: pd.DataFrame, col: str):
     if col not in df.columns:
         return None
-    s = pd.to_numeric(df[col], errors="coerce")
+    s = safe_numeric(df[col])
     if s.dropna().empty:
         return None
     return float(s.mean())
 
 
-def safe_numeric_sum(df: pd.DataFrame, col: str):
+def safe_sum(df: pd.DataFrame, col: str):
     if col not in df.columns:
         return None
-    s = pd.to_numeric(df[col], errors="coerce")
+    s = safe_numeric(df[col])
     if s.dropna().empty:
         return None
     return float(s.sum())
@@ -67,24 +71,8 @@ def safe_count_unique(df: pd.DataFrame, col: str):
     return int(df[col].dropna().astype(str).nunique())
 
 
-def safe_value_count_df(df: pd.DataFrame, col: str, label_name: str = "categoria"):
-    if col not in df.columns:
-        return pd.DataFrame()
-    out = (
-        df[col]
-        .fillna("Sin dato")
-        .astype(str)
-        .value_counts(dropna=False)
-        .rename_axis(label_name)
-        .reset_index(name="conteo")
-    )
-    return out
-
-
-def pct(part, total):
-    if total in [0, None]:
-        return None
-    return 100.0 * part / total
+def normalize_text(series: pd.Series):
+    return series.astype(str).str.strip().str.lower()
 
 
 def fmt_int(x):
@@ -93,7 +81,7 @@ def fmt_int(x):
     return f"{int(round(x)):,}".replace(",", ".")
 
 
-def fmt_float(x, decimals=2):
+def fmt_num(x, decimals=2):
     if x is None or pd.isna(x):
         return "N/D"
     return f"{x:,.{decimals}f}".replace(",", "X").replace(".", ",").replace("X", ".")
@@ -105,69 +93,143 @@ def fmt_pct(x, decimals=1):
     return f"{x:.{decimals}f}%"
 
 
-def normalize_text_series(s: pd.Series):
-    return s.astype(str).str.strip().str.lower()
+def get_pct(part, total):
+    if part is None or total in [None, 0]:
+        return None
+    return 100 * part / total
 
 
-def detect_high_risk_count(df: pd.DataFrame):
+def value_count_df(df: pd.DataFrame, col: str, name_col="categoria", top_n=None):
+    if col not in df.columns:
+        return pd.DataFrame()
+    out = (
+        df[col]
+        .fillna("Sin dato")
+        .astype(str)
+        .value_counts(dropna=False)
+        .rename_axis(name_col)
+        .reset_index(name="conteo")
+    )
+    if top_n is not None:
+        out = out.head(top_n)
+    return out
+
+
+def mean_by_group(df: pd.DataFrame, group_col: str, value_col: str, top_n=None):
+    if group_col not in df.columns or value_col not in df.columns:
+        return pd.DataFrame()
+    temp = df[[group_col, value_col]].copy()
+    temp[value_col] = safe_numeric(temp[value_col])
+    temp = temp.dropna(subset=[value_col])
+    if temp.empty:
+        return pd.DataFrame()
+    out = (
+        temp.groupby(group_col, dropna=False)[value_col]
+        .mean()
+        .sort_values(ascending=False)
+        .reset_index()
+    )
+    out[group_col] = out[group_col].fillna("Sin dato").astype(str)
+    if top_n is not None:
+        out = out.head(top_n)
+    return out
+
+
+def sum_by_group(df: pd.DataFrame, group_col: str, value_col: str, top_n=None):
+    if group_col not in df.columns or value_col not in df.columns:
+        return pd.DataFrame()
+    temp = df[[group_col, value_col]].copy()
+    temp[value_col] = safe_numeric(temp[value_col])
+    temp = temp.dropna(subset=[value_col])
+    if temp.empty:
+        return pd.DataFrame()
+    out = (
+        temp.groupby(group_col, dropna=False)[value_col]
+        .sum()
+        .sort_values(ascending=False)
+        .reset_index()
+    )
+    out[group_col] = out[group_col].fillna("Sin dato").astype(str)
+    if top_n is not None:
+        out = out.head(top_n)
+    return out
+
+
+def high_risk_mask(df: pd.DataFrame):
     if "predicted_risk_segment" not in df.columns:
-        return None
-    s = normalize_text_series(df["predicted_risk_segment"])
-    return int(s.isin(["high", "very_high", "alto", "muy_alto", "muy alto"]).sum())
+        return pd.Series(False, index=df.index)
+    s = normalize_text(df["predicted_risk_segment"])
+    return s.isin(["high", "very_high", "alto", "muy_alto", "muy alto"])
 
 
-def detect_underpriced_count(df: pd.DataFrame):
-    if "pricing_status" not in df.columns:
-        return None
-    s = normalize_text_series(df["pricing_status"])
-    return int(s.isin(["underpriced", "infra-priced", "infra_precificado", "infra precificado"]).sum())
-
-
-def detect_high_abuse_count(df: pd.DataFrame):
+def high_abuse_mask(df: pd.DataFrame):
     if "member_abuse_severity" not in df.columns:
-        return None
-    s = normalize_text_series(df["member_abuse_severity"])
-    return int(s.isin(["high", "very_high", "alto", "muy_alto", "muy alto"]).sum())
+        return pd.Series(False, index=df.index)
+    s = normalize_text(df["member_abuse_severity"])
+    return s.isin(["high", "very_high", "alto", "muy_alto", "muy alto"])
+
+
+def pricing_tension_mask(df: pd.DataFrame):
+    if "pricing_adequacy_ratio" in df.columns:
+        ratio = safe_numeric(df["pricing_adequacy_ratio"])
+        return ratio.notna() & ((ratio < 0.90) | (ratio > 1.10))
+
+    if "pricing_status" in df.columns:
+        s = normalize_text(df["pricing_status"])
+        return s.isin(["underpriced", "overpriced", "infra_precificado", "sobre_precificado"])
+
+    return pd.Series(False, index=df.index)
+
+
+def fraud_exposed_mask(df: pd.DataFrame):
+    masks = []
+
+    if "flagged_provider_claims_n" in df.columns:
+        masks.append(safe_numeric(df["flagged_provider_claims_n"]).fillna(0) > 0)
+
+    if "flagged_provider_cost_sum" in df.columns:
+        masks.append(safe_numeric(df["flagged_provider_cost_sum"]).fillna(0) > 0)
+
+    if "flagged_provider_claims_pct" in df.columns:
+        masks.append(safe_numeric(df["flagged_provider_claims_pct"]).fillna(0) > 0)
+
+    if not masks:
+        return pd.Series(False, index=df.index)
+
+    out = masks[0].copy()
+    for m in masks[1:]:
+        out = out | m
+    return out
 
 
 def build_priority_table(df: pd.DataFrame):
     temp = df.copy()
 
-    if "predicted_risk_segment" in temp.columns:
-        s = normalize_text_series(temp["predicted_risk_segment"])
-        temp["flag_riesgo_alto"] = s.isin(["high", "very_high", "alto", "muy_alto", "muy alto"]).astype(int)
-    else:
-        temp["flag_riesgo_alto"] = 0
-
-    if "pricing_status" in temp.columns:
-        s = normalize_text_series(temp["pricing_status"])
-        temp["flag_pricing_critico"] = s.isin(["underpriced", "infra-priced", "infra_precificado", "infra precificado"]).astype(int)
-    else:
-        temp["flag_pricing_critico"] = 0
-
-    if "member_abuse_severity" in temp.columns:
-        s = normalize_text_series(temp["member_abuse_severity"])
-        temp["flag_abuso_alto"] = s.isin(["high", "very_high", "alto", "muy_alto", "muy alto"]).astype(int)
-    else:
-        temp["flag_abuso_alto"] = 0
+    temp["flag_riesgo_alto"] = high_risk_mask(temp).astype(int)
+    temp["flag_tension_pricing"] = pricing_tension_mask(temp).astype(int)
+    temp["flag_abuso_alto"] = high_abuse_mask(temp).astype(int)
+    temp["flag_fraude_expuesto"] = fraud_exposed_mask(temp).astype(int)
 
     if "cancellation_flag" in temp.columns:
-        temp["flag_cancelacion"] = pd.to_numeric(temp["cancellation_flag"], errors="coerce").fillna(0).astype(int)
+        temp["flag_cancelacion"] = safe_numeric(temp["cancellation_flag"]).fillna(0).astype(int)
     else:
         temp["flag_cancelacion"] = 0
 
     temp["prioridad_total"] = (
         temp["flag_riesgo_alto"]
-        + temp["flag_pricing_critico"]
+        + temp["flag_tension_pricing"]
         + temp["flag_abuso_alto"]
+        + temp["flag_fraude_expuesto"]
         + temp["flag_cancelacion"]
     )
+
+    if "approved_cost_sum" in temp.columns:
+        temp["approved_cost_sum"] = safe_numeric(temp["approved_cost_sum"])
 
     sort_cols = ["prioridad_total"]
     ascending = [False]
 
     if "approved_cost_sum" in temp.columns:
-        temp["approved_cost_sum"] = pd.to_numeric(temp["approved_cost_sum"], errors="coerce")
         sort_cols.append("approved_cost_sum")
         ascending.append(False)
 
@@ -177,9 +239,12 @@ def build_priority_table(df: pd.DataFrame):
         "region",
         "plan_type",
         "plan_tier",
+        "coverage_scope",
         "predicted_risk_segment",
-        "pricing_status",
+        "pricing_adequacy_ratio",
         "member_abuse_severity",
+        "flagged_provider_claims_n",
+        "flagged_provider_cost_sum",
         "approved_cost_sum",
         "premium_monthly",
         "claims_count",
@@ -188,8 +253,7 @@ def build_priority_table(df: pd.DataFrame):
     ]
     cols = [c for c in cols if c in temp.columns]
 
-    out = temp.sort_values(sort_cols, ascending=ascending)[cols].head(20).copy()
-    return out
+    return temp.sort_values(sort_cols, ascending=ascending)[cols].head(20).copy()
 
 
 # =========================================================
@@ -201,7 +265,7 @@ except Exception as e:
     st.title(APP_TITLE)
     st.caption(APP_SUBTITLE)
     st.error(f"No se pudo cargar el dataset maestro principal: {e}")
-    st.info("Revisa que el archivo de datos esté correctamente incluido en el repositorio y que la ruta de carga sea válida.")
+    st.info("Revisa que el archivo de datos esté correctamente incluido en el proyecto y que la ruta de carga sea válida.")
     st.stop()
 
 try:
@@ -223,13 +287,13 @@ st.caption(APP_SUBTITLE)
 
 st.markdown(
     """
-    **Visión general ejecutiva del portfolio**  
-    Esta página resume de forma integrada la cartera asegurada, la adecuación de pricing,
-    la exposición a abuso/fraude y algunos patrones básicos del negocio.
+    **Visión general ejecutiva del portfolio asegurado**  
+    Esta vista resume tamaño de cartera, exposición al riesgo, adecuación de pricing,
+    señales de abuso / fraude y composición general del negocio.
 
     **Aviso importante:** este dashboard es una herramienta analítica de apoyo a la decisión.
     No sustituye la evaluación actuarial, clínica, antifraude, de suscripción o de negocio.
-    Algunos indicadores o primas simuladas pueden diferir de condiciones operativas reales.
+    Algunas primas, costes o indicadores simulados pueden diferir de condiciones operativas reales.
     """
 )
 
@@ -238,142 +302,135 @@ n_rows = overview.get("rows", len(df))
 n_cols = overview.get("columns", df.shape[1])
 
 # =========================================================
-# KPIS GLOBALES
+# RESUMEN GENERAL
 # =========================================================
 st.markdown("## Resumen general")
 
-unique_members = safe_count_unique(df, "member_id")
-unique_policies = safe_count_unique(df, "policy_id")
-provider_n = len(provider_df) if not provider_df.empty else None
-prospect_n = len(prospect_df) if not prospect_df.empty else None
+n_members = safe_count_unique(df, "member_id")
+n_policies = safe_count_unique(df, "policy_id")
+n_providers = len(provider_df) if not provider_df.empty else None
+n_prospects = len(prospect_df) if not prospect_df.empty else None
+avg_premium = safe_mean(df, "premium_monthly")
+total_approved_cost = safe_sum(df, "approved_cost_sum")
+avg_loss_ratio = safe_mean(df, "observed_loss_ratio")
 
-avg_premium_monthly = safe_numeric_mean(df, "premium_monthly")
-sum_approved_cost = safe_numeric_sum(df, "approved_cost_sum")
-avg_loss_ratio = safe_numeric_mean(df, "observed_loss_ratio")
+r1c1, r1c2, r1c3, r1c4 = st.columns(4)
+r1c1.metric("Miembros analizados", fmt_int(n_members if n_members is not None else n_rows))
+r1c2.metric("Pólizas analizadas", fmt_int(n_policies if n_policies is not None else n_rows))
+r1c3.metric("Prestadores", fmt_int(n_providers))
+r1c4.metric("Prospectos", fmt_int(n_prospects))
 
-k1, k2, k3, k4 = st.columns(4)
-k1.metric("Miembros analizados", fmt_int(unique_members if unique_members is not None else n_rows))
-k2.metric("Pólizas analizadas", fmt_int(unique_policies if unique_policies is not None else n_rows))
-k3.metric("Prestadores", fmt_int(provider_n))
-k4.metric("Prospectos", fmt_int(prospect_n))
-
-k5, k6, k7 = st.columns(3)
-k5.metric("Prima mensual media", fmt_float(avg_premium_monthly))
-k6.metric("Coste aprobado total", fmt_float(sum_approved_cost))
-k7.metric("Siniestralidad observada media", fmt_pct(avg_loss_ratio * 100 if avg_loss_ratio is not None and avg_loss_ratio <= 1.5 else avg_loss_ratio))
+r2c1, r2c2, r2c3 = st.columns(3)
+r2c1.metric("Prima mensual media", fmt_num(avg_premium))
+r2c2.metric("Coste aprobado total", fmt_num(total_approved_cost))
+r2c3.metric(
+    "Siniestralidad observada media",
+    fmt_pct(avg_loss_ratio * 100 if avg_loss_ratio is not None and avg_loss_ratio <= 2 else avg_loss_ratio)
+)
 
 # =========================================================
-# ALERTAS CLAVE
+# SEÑALES CLAVE
 # =========================================================
-st.markdown("## Señales clave de cartera")
+st.markdown("## Señales clave")
 
 total_cases = len(df)
 
-high_risk_n = detect_high_risk_count(df)
-underpriced_n = detect_underpriced_count(df)
-high_abuse_n = detect_high_abuse_count(df)
+mask_risk = high_risk_mask(df)
+mask_pricing = pricing_tension_mask(df)
+mask_abuse = high_abuse_mask(df)
+mask_fraud = fraud_exposed_mask(df)
 
-a1, a2, a3 = st.columns(3)
+high_risk_n = int(mask_risk.sum())
+pricing_tension_n = int(mask_pricing.sum())
+fraud_exposed_n = int(mask_fraud.sum())
 
-a1.metric(
+s1, s2, s3 = st.columns(3)
+s1.metric(
     "Riesgo alto / muy alto",
     fmt_int(high_risk_n),
-    fmt_pct(pct(high_risk_n, total_cases)) if high_risk_n is not None else None,
+    fmt_pct(get_pct(high_risk_n, total_cases))
 )
-
-a2.metric(
-    "Pólizas infraprecificadas",
-    fmt_int(underpriced_n),
-    fmt_pct(pct(underpriced_n, total_cases)) if underpriced_n is not None else None,
+s2.metric(
+    "Tensión de pricing",
+    fmt_int(pricing_tension_n),
+    fmt_pct(get_pct(pricing_tension_n, total_cases))
 )
-
-a3.metric(
-    "Abuso alto / muy alto",
-    fmt_int(high_abuse_n),
-    fmt_pct(pct(high_abuse_n, total_cases)) if high_abuse_n is not None else None,
+s3.metric(
+    "Exposición a fraude / abuso",
+    fmt_int(fraud_exposed_n),
+    fmt_pct(get_pct(fraud_exposed_n, total_cases))
 )
 
 # =========================================================
-# TARJETAS EJECUTIVAS
+# LECTURA EJECUTIVA
 # =========================================================
 st.markdown("## Lectura ejecutiva")
 
-c1, c2, c3 = st.columns(3)
+e1, e2, e3 = st.columns(3)
 
-with c1:
+with e1:
     st.markdown("### Riesgo")
-    risk_prob_mean = safe_numeric_mean(df, "predicted_risk_probability")
-    top_risk_segment = None
-    if "predicted_risk_segment" in df.columns:
-        mode = df["predicted_risk_segment"].dropna().astype(str).mode()
-        if not mode.empty:
-            top_risk_segment = mode.iloc[0]
 
-    st.write(f"**Probabilidad media de riesgo:** {fmt_float(risk_prob_mean)}")
-    st.write(f"**Segmento dominante:** {top_risk_segment if top_risk_segment else 'N/D'}")
-    st.write(f"**Casos altos / muy altos:** {fmt_int(high_risk_n)}")
+    risk_cost = safe_sum(df.loc[mask_risk], "approved_cost_sum")
+    risk_loss_ratio = safe_mean(df.loc[mask_risk], "observed_loss_ratio")
+    risk_claims = safe_sum(df.loc[mask_risk], "claims_count")
 
-with c2:
+    st.write(f"**Casos de riesgo alto / muy alto:** {fmt_int(high_risk_n)}")
+    st.write(f"**% del portfolio:** {fmt_pct(get_pct(high_risk_n, total_cases))}")
+    st.write(f"**Coste aprobado del grupo:** {fmt_num(risk_cost)}")
+    st.write(
+        f"**Siniestralidad media del grupo:** "
+        f"{fmt_pct(risk_loss_ratio * 100 if risk_loss_ratio is not None and risk_loss_ratio <= 2 else risk_loss_ratio)}"
+    )
+
+with e2:
     st.markdown("### Pricing")
-    pricing_gap_mean = safe_numeric_mean(df, "premium_gap_vs_expected")
-    top_pricing_status = None
-    if "pricing_status" in df.columns:
-        mode = df["pricing_status"].dropna().astype(str).mode()
-        if not mode.empty:
-            top_pricing_status = mode.iloc[0]
 
-    suggested_mid_mean = safe_numeric_mean(df, "suggested_premium_mid")
+    avg_suggested_mid = safe_mean(df, "suggested_premium_mid")
+    avg_adequacy_ratio = safe_mean(df, "pricing_adequacy_ratio")
+    sum_gap_expected = safe_sum(df, "premium_gap_vs_expected")
+    tension_gap_expected = safe_sum(df.loc[mask_pricing], "premium_gap_vs_expected")
 
-    st.write(f"**Estado dominante:** {top_pricing_status if top_pricing_status else 'N/D'}")
-    st.write(f"**Gap medio vs esperado:** {fmt_float(pricing_gap_mean)}")
-    st.write(f"**Prima sugerida media:** {fmt_float(suggested_mid_mean)}")
+    st.write(f"**Prima mensual media actual:** {fmt_num(avg_premium)}")
+    st.write(f"**Prima sugerida media:** {fmt_num(avg_suggested_mid)}")
+    st.write(f"**Ratio medio de adecuación:** {fmt_num(avg_adequacy_ratio)}")
+    st.write(f"**Brecha agregada vs esperado:** {fmt_num(sum_gap_expected)}")
+    st.write(f"**Brecha en casos con tensión:** {fmt_num(tension_gap_expected)}")
 
-with c3:
+with e3:
     st.markdown("### Abuso / fraude")
-    member_abuse_score_mean = safe_numeric_mean(df, "member_abuse_score")
-    flagged_provider_cost_sum = safe_numeric_sum(df, "flagged_provider_cost_sum")
-    provider_fraud_max_mean = safe_numeric_mean(df, "provider_fraud_score_max")
 
-    st.write(f"**Score medio de abuso miembro:** {fmt_float(member_abuse_score_mean)}")
-    st.write(f"**Coste asociado a prestadores marcados:** {fmt_float(flagged_provider_cost_sum)}")
-    st.write(f"**Score máximo fraude proveedor (medio):** {fmt_float(provider_fraud_max_mean)}")
+    high_abuse_n = int(mask_abuse.sum())
+    fraud_cost = safe_sum(df.loc[mask_fraud], "flagged_provider_cost_sum")
+    fraud_cost_pct = safe_mean(df.loc[mask_fraud], "flagged_provider_cost_pct")
+    fraud_claims_n = safe_sum(df.loc[mask_fraud], "flagged_provider_claims_n")
+
+    st.write(f"**Casos con abuso alto / muy alto:** {fmt_int(high_abuse_n)}")
+    st.write(f"**Casos expuestos a prestadores marcados:** {fmt_int(fraud_exposed_n)}")
+    st.write(f"**Claims ligados a prestadores marcados:** {fmt_int(fraud_claims_n)}")
+    st.write(f"**Coste asociado a prestadores marcados:** {fmt_num(fraud_cost)}")
+    st.write(f"**% medio de coste expuesto:** {fmt_pct(fraud_cost_pct)}")
 
 # =========================================================
-# EDA RESUMIDO
+# EXPLORACIÓN GENERAL
 # =========================================================
 st.markdown("## Exploración general")
 
 g1, g2 = st.columns(2)
 
 with g1:
-    if "predicted_risk_segment" in df.columns:
-        st.markdown("#### Distribución por segmento de riesgo")
-        risk_dist = safe_value_count_df(df, "predicted_risk_segment", "segmento")
-        if not risk_dist.empty:
-            st.bar_chart(risk_dist.set_index("segmento"))
-        else:
-            st.info("No hay datos suficientes para mostrar este gráfico.")
+    st.markdown("#### Distribución por segmento de riesgo")
+    risk_dist = value_count_df(df, "predicted_risk_segment", "segmento")
+    if not risk_dist.empty:
+        st.bar_chart(risk_dist.set_index("segmento"))
     else:
-        st.info("La columna de segmento de riesgo no está disponible.")
+        st.info("No hay datos suficientes para mostrar este gráfico.")
 
 with g2:
-    if "pricing_status" in df.columns:
-        st.markdown("#### Distribución por estado de pricing")
-        pricing_dist = safe_value_count_df(df, "pricing_status", "estado")
-        if not pricing_dist.empty:
-            st.bar_chart(pricing_dist.set_index("estado"))
-        else:
-            st.info("No hay datos suficientes para mostrar este gráfico.")
-    else:
-        st.info("La columna de estado de pricing no está disponible.")
-
-g3, g4 = st.columns(2)
-
-with g3:
-    group_col = "plan_tier" if "plan_tier" in df.columns else ("plan_type" if "plan_type" in df.columns else None)
-    if group_col:
-        st.markdown("#### Mix de cartera por plan")
-        plan_dist = safe_value_count_df(df, group_col, "plan")
+    st.markdown("#### Mix de cartera por plan")
+    group_col_plan = "plan_tier" if "plan_tier" in df.columns else ("plan_type" if "plan_type" in df.columns else None)
+    if group_col_plan:
+        plan_dist = value_count_df(df, group_col_plan, "plan")
         if not plan_dist.empty:
             st.bar_chart(plan_dist.set_index("plan"))
         else:
@@ -381,22 +438,58 @@ with g3:
     else:
         st.info("No hay columnas de plan disponibles.")
 
+g3, g4 = st.columns(2)
+
+with g3:
+    st.markdown("#### Distribución por cobertura")
+    coverage_dist = value_count_df(df, "coverage_scope", "cobertura")
+    if not coverage_dist.empty:
+        st.bar_chart(coverage_dist.set_index("cobertura"))
+    else:
+        st.info("No hay datos suficientes para mostrar este gráfico.")
+
 with g4:
-    if "region" in df.columns:
-        st.markdown("#### Distribución territorial")
-        region_dist = safe_value_count_df(df, "region", "region")
-        if not region_dist.empty:
-            st.bar_chart(region_dist.set_index("region"))
+    st.markdown("#### Prima mensual media por tipo de plan")
+    econ_group_col = "plan_type" if "plan_type" in df.columns else ("plan_tier" if "plan_tier" in df.columns else None)
+    if econ_group_col:
+        premium_by_plan = mean_by_group(df, econ_group_col, "premium_monthly")
+        if not premium_by_plan.empty:
+            st.bar_chart(premium_by_plan.set_index(econ_group_col))
         else:
             st.info("No hay datos suficientes para mostrar este gráfico.")
     else:
-        st.info("La columna de región no está disponible.")
+        st.info("No hay columnas de plan disponibles para el análisis económico.")
 
 # =========================================================
-# TABLA RESUMEN DE CASOS PRIORITARIOS
+# BLOQUE ECONÓMICO ADICIONAL
+# =========================================================
+st.markdown("## Lectura económica")
+
+eco1, eco2 = st.columns(2)
+
+with eco1:
+    st.markdown("#### Coste aprobado total por cobertura")
+    cost_by_cov = sum_by_group(df, "coverage_scope", "approved_cost_sum")
+    if not cost_by_cov.empty:
+        st.bar_chart(cost_by_cov.set_index("coverage_scope"))
+    else:
+        st.info("No hay datos suficientes para mostrar este gráfico.")
+
+with eco2:
+    st.markdown("#### Prima anual media por cobertura")
+    annual_premium_by_cov = mean_by_group(df, "coverage_scope", "premium_annual")
+    if not annual_premium_by_cov.empty:
+        st.bar_chart(annual_premium_by_cov.set_index("coverage_scope"))
+    else:
+        st.info("No hay datos suficientes para mostrar este gráfico.")
+
+# =========================================================
+# CASOS PRIORITARIOS
 # =========================================================
 st.markdown("## Casos prioritarios")
-st.caption("Selección orientativa de registros con mayor criticidad combinada entre riesgo, pricing, abuso y cancelación.")
+st.caption(
+    "Selección orientativa de registros con mayor criticidad combinada entre riesgo, pricing, abuso, exposición a red marcada y cancelación."
+)
 
 priority_table = build_priority_table(df)
 
@@ -406,9 +499,10 @@ else:
     st.dataframe(priority_table, use_container_width=True, hide_index=True)
 
 # =========================================================
-# PIE DE PÁGINA / CONTEXTO DEL DATASET
+# CONTEXTO DEL DATASET
 # =========================================================
 st.markdown("## Contexto del dataset")
+
 f1, f2 = st.columns(2)
 f1.metric("Filas del maestro", fmt_int(n_rows))
 f2.metric("Columnas del maestro", fmt_int(n_cols))
