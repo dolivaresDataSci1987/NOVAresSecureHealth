@@ -124,6 +124,7 @@ def build_score_buckets(series):
     out.columns = ["tramo", "casos"]
     return out
 
+
 def explain_abuse_reason(reason):
     if pd.isna(reason):
         return "Sin dato"
@@ -178,6 +179,19 @@ def explain_provider_reason(reason):
         reason_key,
         f"Señal técnica detectada: {reason_str.replace('_', ' ')}."
     )
+
+
+def render_chart_explanation(title, text):
+    with st.container(border=True):
+        st.markdown(f"**Cómo interpretar este bloque · {title}**")
+        st.markdown(text)
+
+
+def build_dictionary_df(dictionary_map):
+    return pd.DataFrame(
+        [{"término": k, "explicación": v} for k, v in dictionary_map.items()]
+    )
+
 
 # =========================================================
 # COLUMNAS DISPONIBLES
@@ -282,6 +296,55 @@ else:
 
 
 # =========================================================
+# DICCIONARIOS
+# =========================================================
+member_metric_dict = {
+    "member_abuse_score": "Score continuo de sospecha de abuso a nivel cliente. Cuanto más alto, mayor prioridad de revisión.",
+    "member_abuse_severity": "Clasificación cualitativa del nivel de sospecha de abuso.",
+    "member_abuse_reason": "Motivo principal que explica por qué el modelo marca el caso.",
+    "claims_count": "Número de reclamos o usos registrados para el asegurado.",
+    "approved_cost_sum": "Coste total aprobado asociado al asegurado.",
+    "predicted_risk_probability": "Probabilidad estimada de riesgo clínico o asistencial del asegurado.",
+    "predicted_risk_segment": "Segmento de riesgo estimado del asegurado.",
+    "flagged_provider_claims_n": "Número de reclamos realizados con proveedores previamente marcados.",
+    "flagged_provider_claims_pct": "Porcentaje de reclamos asociados a proveedores marcados.",
+    "flagged_provider_cost_sum": "Coste total asociado a proveedores marcados.",
+    "flagged_provider_cost_pct": "Porcentaje del coste total que procede de proveedores marcados.",
+    "provider_fraud_score_max": "Máximo nivel de riesgo de fraude observado entre los proveedores vinculados al cliente.",
+}
+
+abuse_reason_dict_full = {
+    "high_claim_volume": "Volumen de reclamos anormalmente alto para el perfil del asegurado.",
+    "high_base_cost": "Coste sanitario base elevado frente a lo esperado para perfiles comparables.",
+    "flagged_provider_exposure": "Alta exposición a proveedores ya marcados o sospechosos.",
+    "high_flagged_provider_cost": "Parte importante del coste del cliente procede de proveedores marcados.",
+    "high_flagged_provider_use": "Uso frecuente de proveedores con señales previas de comportamiento anómalo.",
+    "cost_frequency_mismatch": "La combinación de frecuencia y coste no parece consistente con un uso normal.",
+    "high_cost_outlier": "Coste total claramente extremo respecto al resto de clientes comparables.",
+    "high_claim_frequency": "Frecuencia de reclamos superior a la esperada.",
+    "repeat_flagged_provider_pattern": "Patrón repetido de uso de proveedores marcados.",
+    "network_abuse_pattern": "Uso de la red asistencial con patrón potencialmente oportunista o abusivo.",
+    "provider_risk_exposure": "Elevada exposición a proveedores con mayor riesgo de fraude.",
+    "mixed_abuse_pattern": "Combinación de varias señales de abuso en el mismo caso.",
+    "high_utilization_pattern": "Uso intensivo de servicios o prestaciones por encima de lo habitual.",
+    "unusual_claim_pattern": "Patrón de reclamos atípico frente al comportamiento esperado.",
+    "chronic_overuse_pattern": "Uso excesivo recurrente no explicado solo por cronicidad.",
+    "high_cost_and_frequency": "Coinciden alta frecuencia de uso y alto coste.",
+}
+
+provider_reason_dict_full = {
+    "high_claim_volume": "Volumen de reclamos elevado para ese proveedor.",
+    "high_total_cost": "Coste total facturado anormalmente alto.",
+    "high_cost_per_claim": "Coste medio por reclamo superior a lo esperado.",
+    "billing_anomaly": "Posible anomalía en el patrón de facturación.",
+    "repeat_member_pattern": "Patrón repetitivo con determinados asegurados.",
+    "suspicious_specialty_pattern": "Comportamiento atípico dentro de su especialidad.",
+    "high_flag_rate": "Acumula múltiples señales de alerta en el modelo.",
+    "mixed_fraud_pattern": "Combina varias señales de fraude o facturación anómala.",
+}
+
+
+# =========================================================
 # TABS
 # =========================================================
 tab1, tab2 = st.tabs(["Abuso por cliente", "Fraude por proveedor"])
@@ -297,6 +360,21 @@ with tab1:
         "El objetivo no es detectar solo clientes caros, sino clientes cuyo patrón de uso, frecuencia de reclamos "
         "o exposición a proveedores marcados sugiera un posible abuso de la póliza."
     )
+
+    with st.expander("Diccionario de métricas y señales de abuso", expanded=False):
+        st.markdown("### Métricas principales")
+        st.dataframe(
+            build_dictionary_df(member_metric_dict),
+            use_container_width=True,
+            hide_index=True
+        )
+
+        st.markdown("### Señales técnicas de abuso")
+        st.dataframe(
+            build_dictionary_df(abuse_reason_dict_full),
+            use_container_width=True,
+            hide_index=True
+        )
 
     # -----------------------------------------------------
     # SIDEBAR / FILTROS
@@ -441,6 +519,12 @@ with tab1:
             sev_dist["orden"] = sev_dist["severidad"].map(severity_order_key)
             sev_dist = sev_dist.sort_values("orden").drop(columns="orden")
             st.bar_chart(sev_dist.set_index("severidad"))
+            render_chart_explanation(
+                "Distribución por severidad de abuso",
+                "Este gráfico muestra cuántos clientes caen en cada nivel de severidad. "
+                "Una concentración en **Alto** o **Muy alto** indica una cartera con mayor volumen de casos prioritarios para revisión. "
+                "Si la mayor parte se concentra en niveles bajos o medios, el problema puede estar más focalizado en bolsillos concretos que en toda la cartera."
+            )
             st.dataframe(sev_dist, use_container_width=True, hide_index=True)
         else:
             st.info("No existe la columna de severidad de abuso.")
@@ -450,6 +534,12 @@ with tab1:
         if abuse_score_col and df_filtered[abuse_score_col].notna().any():
             score_dist = build_score_buckets(df_filtered[abuse_score_col])
             st.bar_chart(score_dist.set_index("tramo"))
+            render_chart_explanation(
+                "Distribución del abuse score",
+                "El score resume la intensidad de sospecha de abuso. "
+                "Si muchos casos se concentran en tramos **altos** o **muy altos**, aumenta la necesidad de revisión operativa. "
+                "Si la distribución está más desplazada hacia valores bajos, la sospecha está menos extendida y más concentrada en casos puntuales."
+            )
             st.dataframe(score_dist, use_container_width=True, hide_index=True)
         else:
             st.info("No existe información suficiente de abuse score.")
@@ -471,7 +561,14 @@ with tab1:
                 .rename_axis("motivo")
                 .reset_index(name="casos")
             )
-            st.bar_chart(reason_dist.set_index("motivo"))
+            reason_dist["explicación"] = reason_dist["motivo"].apply(explain_abuse_reason)
+            st.bar_chart(reason_dist.set_index("motivo")[["casos"]])
+            render_chart_explanation(
+                "Motivos de abuso más frecuentes",
+                "Aquí se observa qué señales técnicas aparecen con más frecuencia. "
+                "No significa que todos los casos respondan a fraude real, sino que el modelo detecta patrones que merecen revisión. "
+                "Una concentración en pocos motivos sugiere un patrón dominante; una distribución más dispersa indica casuística más heterogénea."
+            )
             st.dataframe(reason_dist, use_container_width=True, hide_index=True)
         else:
             st.info("No existe la columna de motivo de abuso.")
@@ -492,6 +589,12 @@ with tab1:
             cost_by_sev["orden"] = cost_by_sev[abuse_severity_col].map(severity_order_key)
             cost_by_sev = cost_by_sev.sort_values("orden").drop(columns="orden")
             st.bar_chart(cost_by_sev.set_index(abuse_severity_col)[["coste_total"]])
+            render_chart_explanation(
+                "Coste aprobado por severidad de abuso",
+                "Este bloque permite ver si el coste está concentrado en los casos de mayor severidad. "
+                "Si los niveles **Altos** y **Muy altos** acumulan una gran parte del coste, la revisión prioritaria puede generar más impacto económico. "
+                "Si el coste está más repartido, conviene revisar también patrones de frecuencia y no solo importes."
+            )
             st.dataframe(
                 cost_by_sev.rename(columns={abuse_severity_col: "severidad_abuso"}).style.format({
                     "coste_total": lambda x: fmt_num(x),
@@ -569,6 +672,13 @@ with tab1:
                 else:
                     style_map[col] = lambda x: fmt_num(x)
 
+        render_chart_explanation(
+            "Bolsas de abuso por segmento de cartera",
+            "Esta tabla sirve para detectar en qué segmentos se concentra más la sospecha. "
+            "Los grupos con mayor **porcentaje de abuso alto**, mayor **score medio** o mayor **coste medio** deberían revisarse antes. "
+            "Es útil para pasar de una lógica de caso individual a una lógica de gestión por segmentos."
+        )
+
         st.dataframe(
             group_summary.style.format(style_map),
             use_container_width=True,
@@ -619,11 +729,23 @@ with tab1:
     ]
     review_cols = [c for c in review_cols if c and c in review_df.columns]
 
+    if abuse_reason_col in review_df.columns:
+        review_df["explicación_motivo_abuso"] = review_df[abuse_reason_col].apply(explain_abuse_reason)
+        review_cols_with_text = review_cols + ["explicación_motivo_abuso"]
+    else:
+        review_cols_with_text = review_cols
+
     st.caption(
         "Se priorizan clientes con mayor abuse score, mayor coste y mayor exposición a proveedores marcados."
     )
+    render_chart_explanation(
+        "Casos prioritarios para revisión manual",
+        "Esta tabla no confirma fraude ni abuso real por sí sola. "
+        "Sirve para priorizar expedientes que combinan varias señales: intensidad del score, coste elevado y exposición a proveedores marcados. "
+        "Es el punto de entrada para auditoría manual o revisión clínica/operativa."
+    )
     st.dataframe(
-        review_df[review_cols].head(25),
+        review_df[review_cols_with_text].head(25),
         use_container_width=True,
         hide_index=True
     )
@@ -633,7 +755,7 @@ with tab1:
     # -----------------------------------------------------
     st.markdown("### Vista detallada de clientes")
     st.dataframe(
-        df_filtered[review_cols],
+        review_df[review_cols_with_text],
         use_container_width=True,
         hide_index=True
     )
@@ -647,6 +769,13 @@ with tab2:
     st.caption(
         "Vista secundaria para revisar proveedores anómalos que pueden estar amplificando el abuso observado en clientes."
     )
+
+    with st.expander("Diccionario de señales de fraude por proveedor", expanded=False):
+        st.dataframe(
+            build_dictionary_df(provider_reason_dict_full),
+            use_container_width=True,
+            hide_index=True
+        )
 
     n_providers = len(provider_df)
     flagged_providers = int(provider_df["fraude_severidad_alta_flag"].sum()) if "fraude_severidad_alta_flag" in provider_df.columns else 0
@@ -673,6 +802,11 @@ with tab2:
             sev_counts["orden"] = sev_counts["severidad"].map(severity_order_key)
             sev_counts = sev_counts.sort_values("orden").drop(columns="orden")
             st.bar_chart(sev_counts.set_index("severidad"))
+            render_chart_explanation(
+                "Distribución por severidad de fraude en proveedores",
+                "Permite ver si el riesgo está repartido entre muchos proveedores o concentrado en unos pocos niveles altos. "
+                "Una presencia relevante de proveedores en **Alto** o **Muy alto** puede indicar focos prioritarios de auditoría de red asistencial."
+            )
             st.dataframe(sev_counts, use_container_width=True, hide_index=True)
         else:
             st.info("No existe la columna de severidad de fraude.")
@@ -689,7 +823,13 @@ with tab2:
                 .rename_axis("motivo")
                 .reset_index(name="casos")
             )
-            st.bar_chart(reason_counts.set_index("motivo"))
+            reason_counts["explicación"] = reason_counts["motivo"].apply(explain_provider_reason)
+            st.bar_chart(reason_counts.set_index("motivo")[["casos"]])
+            render_chart_explanation(
+                "Motivos de fraude más frecuentes en proveedores",
+                "Este bloque muestra qué patrones anómalos aparecen con mayor frecuencia entre los proveedores. "
+                "Sirve para entender si el problema parece estar más relacionado con volumen, coste, facturación o recurrencia de comportamiento."
+            )
             st.dataframe(reason_counts, use_container_width=True, hide_index=True)
         else:
             st.info("No existe la columna de motivo de fraude.")
@@ -711,16 +851,27 @@ with tab2:
     else:
         provider_view = provider_df.copy()
 
+    if provider_reason_col in provider_view.columns:
+        provider_view["explicación_motivo_fraude"] = provider_view[provider_reason_col].apply(explain_provider_reason)
+        provider_cols_with_text = provider_cols + ["explicación_motivo_fraude"]
+    else:
+        provider_cols_with_text = provider_cols
+
     st.markdown("### Proveedores prioritarios")
+    render_chart_explanation(
+        "Proveedores prioritarios",
+        "Esta tabla ordena los proveedores por nivel de sospecha. "
+        "Los primeros registros deberían revisarse antes, especialmente si además acumulan volumen de reclamos o aparecen ligados a múltiples clientes marcados."
+    )
     st.dataframe(
-        provider_view[provider_cols].head(25),
+        provider_view[provider_cols_with_text].head(25),
         use_container_width=True,
         hide_index=True
     )
 
     st.markdown("### Vista detallada de proveedores")
     st.dataframe(
-        provider_view[provider_cols],
+        provider_view[provider_cols_with_text],
         use_container_width=True,
         hide_index=True
     )
