@@ -1,4 +1,4 @@
- import sys
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -15,7 +15,7 @@ if str(ROOT) not in sys.path:
 st.set_page_config(
     page_title="Simulador de Prospecto",
     page_icon="🧭",
-    layout="wide"
+    layout="wide",
 )
 
 
@@ -31,14 +31,12 @@ def load_prospect_data():
     survey_df = None
     pricing_df = None
 
-    # 1) Intentar loader del proyecto
     try:
         from src.data.load_data import load_prospect_master  # type: ignore
         pricing_df = load_prospect_master().copy()
     except Exception:
         pricing_df = None
 
-    # 2) Fallback a CSVs del proyecto o del entorno
     candidate_paths_survey = [
         ROOT / "data" / "processed" / "prospect_survey_synthetic.csv",
         ROOT / "data" / "prospect_survey_synthetic.csv",
@@ -63,8 +61,6 @@ def load_prospect_data():
                 pricing_df = pd.read_csv(p)
                 break
 
-    # Si no hay survey, pero sí pricing, devolvemos pricing
-    # Si no hay ninguno, error controlado
     if survey_df is None and pricing_df is None:
         raise FileNotFoundError(
             "No se ha podido cargar ni el dataset de prospectos ni el dataset maestro de pricing para prospectos."
@@ -118,8 +114,18 @@ def build_base_dataset(survey: pd.DataFrame, pricing: pd.DataFrame) -> pd.DataFr
     """
     Une survey y pricing si ambos existen.
     """
-    if not survey.empty and not pricing.empty and "prospect_id" in survey.columns and "prospect_id" in pricing.columns:
-        merged = survey.merge(pricing, on="prospect_id", how="left", suffixes=("", "_pricing"))
+    if (
+        not survey.empty
+        and not pricing.empty
+        and "prospect_id" in survey.columns
+        and "prospect_id" in pricing.columns
+    ):
+        merged = survey.merge(
+            pricing,
+            on="prospect_id",
+            how="left",
+            suffixes=("", "_pricing"),
+        )
         return merged
 
     if not survey.empty:
@@ -138,37 +144,68 @@ def get_options(df: pd.DataFrame, col: str, fallback: list[str]) -> list[str]:
     return fallback
 
 
-age_band_options = get_options(base_df, "age_band", ["18-24", "25-34", "35-44", "45-54", "55-64", "65+"])
+age_band_options = get_options(
+    base_df,
+    "age_band",
+    ["18-24", "25-34", "35-44", "45-54", "55-64", "65+"],
+)
 sex_options = get_options(base_df, "sex", ["F", "M"])
 region_options = get_options(
     base_df,
     "region",
-    ["Asunción", "Central", "Alto Paraná", "Itapúa", "Caaguazú", "Cordillera", "Paraguarí", "San Pedro"]
+    [
+        "Asunción",
+        "Central",
+        "Alto Paraná",
+        "Itapúa",
+        "Caaguazú",
+        "Cordillera",
+        "Paraguarí",
+        "San Pedro",
+    ],
 )
-health_options = get_options(base_df, "self_rated_health", ["Excellent", "Good", "Fair", "Poor"])
-visits_options = get_options(base_df, "visits_12m_band", ["0-1", "2-4", "5-9", "10+"])
+health_options = get_options(
+    base_df,
+    "self_rated_health",
+    ["Excellent", "Good", "Fair", "Poor"],
+)
+visits_options = get_options(
+    base_df,
+    "visits_12m_band",
+    ["0-1", "2-4", "5-9", "10+"],
+)
 er_options = get_options(base_df, "er_visits_12m_band", ["0", "1", "2+"])
-bmi_options = get_options(base_df, "bmi_group", ["Normal", "Overweight", "Obese"])
-activity_options = get_options(base_df, "physical_activity_level", ["High", "Medium", "Low"])
-preventive_options = get_options(base_df, "preventive_mindset", ["High", "Medium", "Low"])
-preference_options = get_options(base_df, "price_vs_coverage_preference", ["Price", "Balanced", "Coverage"])
-copay_options = get_options(base_df, "copay_tolerance", ["High", "Medium", "Low"])
-network_options = get_options(base_df, "network_preference", ["Narrow", "Balanced", "Broad"])
+bmi_options = get_options(
+    base_df,
+    "bmi_group",
+    ["Normal", "Overweight", "Obese"],
+)
+activity_options = get_options(
+    base_df,
+    "physical_activity_level",
+    ["High", "Medium", "Low"],
+)
+preventive_options = get_options(
+    base_df,
+    "preventive_mindset",
+    ["High", "Medium", "Low"],
+)
+preference_options = get_options(
+    base_df,
+    "price_vs_coverage_preference",
+    ["Price", "Balanced", "Coverage"],
+)
+copay_options = get_options(
+    base_df,
+    "copay_tolerance",
+    ["High", "Medium", "Low"],
+)
+network_options = get_options(
+    base_df,
+    "network_preference",
+    ["Narrow", "Balanced", "Broad"],
+)
 
-
-RISK_SCORE_MAP = {
-    "Low": 1,
-    "Moderate": 2,
-    "High": 3,
-    "Very High": 4,
-}
-
-UTIL_SCORE_MAP = {
-    "Very Low": 1,
-    "Low": 2,
-    "Medium": 3,
-    "High": 4,
-}
 
 HEALTH_SCORE = {
     "Excellent": 0,
@@ -277,12 +314,6 @@ def estimate_cost_annual(risk_tier: str, utilization_band: str) -> float:
 
 
 def recommend_plan(inputs: dict, risk_tier: str, utilization_band: str) -> tuple[str, str, str]:
-    """
-    Devuelve:
-    - tipo de plan
-    - alcance de cobertura
-    - nivel comercial
-    """
     preference = inputs["price_vs_coverage_preference"]
     chronic = int(inputs["chronic_condition_flag"])
     maternity = int(inputs["maternity_interest_flag"])
@@ -320,9 +351,6 @@ def estimate_premium_monthly(cost_annual: float, plan_level: str) -> float:
 
 
 def build_similarity_flags(df: pd.DataFrame, user_row: dict) -> pd.Series:
-    """
-    Score simple de similitud. Cuantos más puntos, más parecido.
-    """
     sim = pd.Series(0, index=df.index, dtype="float64")
 
     if "age_band" in df.columns:
@@ -332,27 +360,52 @@ def build_similarity_flags(df: pd.DataFrame, user_row: dict) -> pd.Series:
     if "region" in df.columns:
         sim += (df["region"].astype(str) == str(user_row["region"])).astype(int) * 1
     if "dependents_n" in df.columns:
-        sim += (df["dependents_n"].fillna(-999).astype(int) == int(user_row["dependents_n"])).astype(int) * 1
+        sim += (
+            df["dependents_n"].fillna(-999).astype(int) == int(user_row["dependents_n"])
+        ).astype(int) * 1
     if "self_rated_health" in df.columns:
-        sim += (df["self_rated_health"].astype(str) == str(user_row["self_rated_health"])).astype(int) * 2
+        sim += (
+            df["self_rated_health"].astype(str) == str(user_row["self_rated_health"])
+        ).astype(int) * 2
     if "chronic_condition_flag" in df.columns:
-        sim += (df["chronic_condition_flag"].fillna(0).astype(int) == int(user_row["chronic_condition_flag"])).astype(int) * 2
+        sim += (
+            df["chronic_condition_flag"].fillna(0).astype(int)
+            == int(user_row["chronic_condition_flag"])
+        ).astype(int) * 2
     if "recurrent_medication_flag" in df.columns:
-        sim += (df["recurrent_medication_flag"].fillna(0).astype(int) == int(user_row["recurrent_medication_flag"])).astype(int) * 1
+        sim += (
+            df["recurrent_medication_flag"].fillna(0).astype(int)
+            == int(user_row["recurrent_medication_flag"])
+        ).astype(int) * 1
     if "visits_12m_band" in df.columns:
-        sim += (df["visits_12m_band"].astype(str) == str(user_row["visits_12m_band"])).astype(int) * 2
+        sim += (
+            df["visits_12m_band"].astype(str) == str(user_row["visits_12m_band"])
+        ).astype(int) * 2
     if "er_visits_12m_band" in df.columns:
-        sim += (df["er_visits_12m_band"].astype(str) == str(user_row["er_visits_12m_band"])).astype(int) * 2
+        sim += (
+            df["er_visits_12m_band"].astype(str)
+            == str(user_row["er_visits_12m_band"])
+        ).astype(int) * 2
     if "hospitalization_24m_flag" in df.columns:
-        sim += (df["hospitalization_24m_flag"].fillna(0).astype(int) == int(user_row["hospitalization_24m_flag"])).astype(int) * 2
+        sim += (
+            df["hospitalization_24m_flag"].fillna(0).astype(int)
+            == int(user_row["hospitalization_24m_flag"])
+        ).astype(int) * 2
     if "smoker_flag" in df.columns:
-        sim += (df["smoker_flag"].fillna(0).astype(int) == int(user_row["smoker_flag"])).astype(int) * 2
+        sim += (
+            df["smoker_flag"].fillna(0).astype(int) == int(user_row["smoker_flag"])
+        ).astype(int) * 2
     if "bmi_group" in df.columns:
         sim += (df["bmi_group"].astype(str) == str(user_row["bmi_group"])).astype(int) * 1
     if "physical_activity_level" in df.columns:
-        sim += (df["physical_activity_level"].astype(str) == str(user_row["physical_activity_level"])).astype(int) * 1
+        sim += (
+            df["physical_activity_level"].astype(str)
+            == str(user_row["physical_activity_level"])
+        ).astype(int) * 1
     if "network_preference" in df.columns:
-        sim += (df["network_preference"].astype(str) == str(user_row["network_preference"])).astype(int) * 1
+        sim += (
+            df["network_preference"].astype(str) == str(user_row["network_preference"])
+        ).astype(int) * 1
 
     return sim
 
@@ -405,7 +458,9 @@ def get_driver_texts(inputs: dict, risk_tier: str, utilization_band: str) -> lis
         drivers.append("Perfil global compatible con uso médico contenido")
 
     if risk_tier in ["High", "Very High"] and utilization_band == "High":
-        drivers.append("Se recomienda una propuesta con control técnico y precio consistente con el riesgo")
+        drivers.append(
+            "Se recomienda una propuesta con control técnico y precio consistente con el riesgo"
+        )
 
     return drivers[:5]
 
@@ -433,9 +488,6 @@ with st.expander("Aviso importante", expanded=False):
         """
     )
 
-# =========================================================
-# LAYOUT PRINCIPAL
-# =========================================================
 left, right = st.columns([1.2, 1])
 
 with left:
@@ -451,78 +503,114 @@ with left:
 
     c4, c5, c6 = st.columns(3)
     with c4:
-        dependents_n = st.number_input("Número de dependientes", min_value=0, max_value=10, value=0, step=1)
+        dependents_n = st.number_input(
+            "Número de dependientes",
+            min_value=0,
+            max_value=10,
+            value=0,
+            step=1,
+        )
     with c5:
-        self_rated_health = st.selectbox("Estado de salud autopercibido", health_options)
+        self_rated_health = st.selectbox(
+            "Estado de salud autopercibido",
+            health_options,
+        )
     with c6:
         chronic_condition_flag = st.selectbox(
             "¿Tiene condición crónica?",
             options=[0, 1],
-            format_func=lambda x: "Sí" if x == 1 else "No"
+            format_func=lambda x: "Sí" if x == 1 else "No",
         )
 
     c7, c8, c9 = st.columns(3)
     with c7:
-        chronic_condition_count = st.number_input("Nº de condiciones crónicas", min_value=0, max_value=10, value=0, step=1)
+        chronic_condition_count = st.number_input(
+            "Nº de condiciones crónicas",
+            min_value=0,
+            max_value=10,
+            value=0,
+            step=1,
+        )
     with c8:
         recurrent_medication_flag = st.selectbox(
             "¿Usa medicación recurrente?",
             options=[0, 1],
-            format_func=lambda x: "Sí" if x == 1 else "No"
+            format_func=lambda x: "Sí" if x == 1 else "No",
         )
     with c9:
-        visits_12m_band = st.selectbox("Consultas médicas últimos 12 meses", visits_options)
+        visits_12m_band = st.selectbox(
+            "Consultas médicas últimos 12 meses",
+            visits_options,
+        )
 
     c10, c11, c12 = st.columns(3)
     with c10:
-        er_visits_12m_band = st.selectbox("Urgencias últimos 12 meses", er_options)
+        er_visits_12m_band = st.selectbox(
+            "Urgencias últimos 12 meses",
+            er_options,
+        )
     with c11:
         hospitalization_24m_flag = st.selectbox(
             "¿Hospitalización en 24 meses?",
             options=[0, 1],
-            format_func=lambda x: "Sí" if x == 1 else "No"
+            format_func=lambda x: "Sí" if x == 1 else "No",
         )
     with c12:
         smoker_flag = st.selectbox(
             "¿Fumador/a?",
             options=[0, 1],
-            format_func=lambda x: "Sí" if x == 1 else "No"
+            format_func=lambda x: "Sí" if x == 1 else "No",
         )
 
     c13, c14, c15 = st.columns(3)
     with c13:
         bmi_group = st.selectbox("Grupo de IMC", bmi_options)
     with c14:
-        physical_activity_level = st.selectbox("Actividad física", activity_options)
+        physical_activity_level = st.selectbox(
+            "Actividad física",
+            activity_options,
+        )
     with c15:
-        preventive_mindset = st.selectbox("Orientación preventiva", preventive_options)
+        preventive_mindset = st.selectbox(
+            "Orientación preventiva",
+            preventive_options,
+        )
 
     c16, c17, c18 = st.columns(3)
     with c16:
-        price_vs_coverage_preference = st.selectbox("Preferencia precio vs cobertura", preference_options)
+        price_vs_coverage_preference = st.selectbox(
+            "Preferencia precio vs cobertura",
+            preference_options,
+        )
     with c17:
-        copay_tolerance = st.selectbox("Tolerancia al copago", copay_options)
+        copay_tolerance = st.selectbox(
+            "Tolerancia al copago",
+            copay_options,
+        )
     with c18:
-        network_preference = st.selectbox("Preferencia de red médica", network_options)
+        network_preference = st.selectbox(
+            "Preferencia de red médica",
+            network_options,
+        )
 
     c19, c20, c21 = st.columns(3)
     with c19:
         maternity_interest_flag = st.selectbox(
             "Interés en maternidad",
             options=[0, 1],
-            format_func=lambda x: "Sí" if x == 1 else "No"
+            format_func=lambda x: "Sí" if x == 1 else "No",
         )
     with c20:
         pharmacy_need_flag = st.selectbox(
             "Necesidad de farmacia",
             options=[0, 1],
-            format_func=lambda x: "Sí" if x == 1 else "No"
+            format_func=lambda x: "Sí" if x == 1 else "No",
         )
     with c21:
         chronic_program_interest_flag = st.selectbox(
             "Interés en programa crónico",
             options=[0, 1],
-            format_func=lambda x: "Sí" if x == 1 else "No"
+            format_func=lambda x: "Sí" if x == 1 else "No",
         )
 
 with right:
@@ -599,18 +687,25 @@ inputs = {
 risk_score = score_risk_from_inputs(inputs)
 predicted_risk_tier = numeric_risk_to_tier(risk_score)
 predicted_utilization_band = numeric_risk_to_utilization(risk_score)
-estimated_cost_annual = estimate_cost_annual(predicted_risk_tier, predicted_utilization_band)
-
-recommended_plan, recommended_scope, recommended_level = recommend_plan(
-    inputs, predicted_risk_tier, predicted_utilization_band
+estimated_cost_annual = estimate_cost_annual(
+    predicted_risk_tier,
+    predicted_utilization_band,
 )
 
-recommended_premium_monthly = estimate_premium_monthly(estimated_cost_annual, recommended_level)
+recommended_plan, recommended_scope, recommended_level = recommend_plan(
+    inputs,
+    predicted_risk_tier,
+    predicted_utilization_band,
+)
+
+recommended_premium_monthly = estimate_premium_monthly(
+    estimated_cost_annual,
+    recommended_level,
+)
 recommended_premium_annual = recommended_premium_monthly * 12
 
 cohort_df = cohort_from_inputs(base_df, inputs, top_n=250)
 
-# Ajustes con cohorte real si existe info suficiente
 if not cohort_df.empty:
     if "risk_tier" in cohort_df.columns:
         cohort_mode_risk = safe_mode(cohort_df["risk_tier"], predicted_risk_tier)
@@ -618,32 +713,49 @@ if not cohort_df.empty:
             predicted_risk_tier = cohort_mode_risk
 
     if "expected_utilization_band" in cohort_df.columns:
-        cohort_mode_util = safe_mode(cohort_df["expected_utilization_band"], predicted_utilization_band)
+        cohort_mode_util = safe_mode(
+            cohort_df["expected_utilization_band"],
+            predicted_utilization_band,
+        )
         if cohort_mode_util in ["Very Low", "Low", "Medium", "High"]:
             predicted_utilization_band = cohort_mode_util
 
     if "recommended_plan" in cohort_df.columns:
-        recommended_plan = safe_mode(cohort_df["recommended_plan"], recommended_plan)
+        recommended_plan = safe_mode(
+            cohort_df["recommended_plan"],
+            recommended_plan,
+        )
 
     if "recommended_plan_tier" in cohort_df.columns:
-        recommended_level = safe_mode(cohort_df["recommended_plan_tier"], recommended_level)
+        recommended_level = safe_mode(
+            cohort_df["recommended_plan_tier"],
+            recommended_level,
+        )
 
     if "recommended_coverage_scope" in cohort_df.columns:
-        recommended_scope = safe_mode(cohort_df["recommended_coverage_scope"], recommended_scope)
+        recommended_scope = safe_mode(
+            cohort_df["recommended_coverage_scope"],
+            recommended_scope,
+        )
 
     if "recommended_premium_monthly" in cohort_df.columns:
-        cohort_premium = pd.to_numeric(cohort_df["recommended_premium_monthly"], errors="coerce").dropna()
+        cohort_premium = pd.to_numeric(
+            cohort_df["recommended_premium_monthly"],
+            errors="coerce",
+        ).dropna()
         if not cohort_premium.empty:
             recommended_premium_monthly = float(cohort_premium.median())
             recommended_premium_annual = recommended_premium_monthly * 12
 
-# Recalcular coste técnico estimado como base del precio recomendado
 margin_map = {"Basic": 1.18, "Mid": 1.28, "Premium": 1.40}
 estimated_cost_annual = recommended_premium_annual / margin_map.get(recommended_level, 1.28)
 
-# Métrica sencilla de margen técnico esperado
 expected_margin_annual = recommended_premium_annual - estimated_cost_annual
-expected_loss_ratio = (estimated_cost_annual / recommended_premium_annual) if recommended_premium_annual > 0 else None
+expected_loss_ratio = (
+    estimated_cost_annual / recommended_premium_annual
+    if recommended_premium_annual > 0
+    else None
+)
 
 drivers = get_driver_texts(inputs, predicted_risk_tier, predicted_utilization_band)
 
@@ -668,14 +780,8 @@ with a1:
 with a2:
     st.metric("Nivel comercial", recommended_level)
 with a3:
-    st.metric(
-        "Margen técnico anual estimado",
-        fmt_money(expected_margin_annual)
-    )
+    st.metric("Margen técnico anual estimado", fmt_money(expected_margin_annual))
 
-# =========================================================
-# LECTURA DE NEGOCIO
-# =========================================================
 left2, right2 = st.columns([1.1, 1])
 
 with left2:
@@ -740,9 +846,6 @@ with right2:
     )
 
 
-# =========================================================
-# TABLAS DE APOYO
-# =========================================================
 tab1, tab2, tab3 = st.tabs(
     ["Ficha del prospecto", "Cohorte comparable", "Diccionario de términos"]
 )
@@ -795,14 +898,16 @@ with tab2:
                 "recommended_plan_tier",
                 "recommended_coverage_scope",
                 "recommended_premium_monthly",
-            ] if c in cohort_df.columns
+            ]
+            if c in cohort_df.columns
         ]
 
         display_df = cohort_df[cols_show].copy()
 
         if "recommended_premium_monthly" in display_df.columns:
             display_df["recommended_premium_monthly"] = pd.to_numeric(
-                display_df["recommended_premium_monthly"], errors="coerce"
+                display_df["recommended_premium_monthly"],
+                errors="coerce",
             ).round(2)
 
         st.dataframe(display_df.head(50), use_container_width=True, hide_index=True)
@@ -812,11 +917,20 @@ with tab2:
         if "risk_tier" in cohort_df.columns:
             c1.metric("Riesgo más frecuente", safe_mode(cohort_df["risk_tier"]))
         if "expected_utilization_band" in cohort_df.columns:
-            c2.metric("Uso más frecuente", safe_mode(cohort_df["expected_utilization_band"]))
+            c2.metric(
+                "Uso más frecuente",
+                safe_mode(cohort_df["expected_utilization_band"]),
+            )
         if "recommended_plan" in cohort_df.columns:
-            c3.metric("Plan más frecuente", safe_mode(cohort_df["recommended_plan"]))
+            c3.metric(
+                "Plan más frecuente",
+                safe_mode(cohort_df["recommended_plan"]),
+            )
         if "recommended_premium_monthly" in cohort_df.columns:
-            premium_med = pd.to_numeric(cohort_df["recommended_premium_monthly"], errors="coerce").median()
+            premium_med = pd.to_numeric(
+                cohort_df["recommended_premium_monthly"],
+                errors="coerce",
+            ).median()
             c4.metric("Prima mediana cohorte", fmt_money(premium_med))
 
 with tab3:
@@ -825,43 +939,43 @@ with tab3:
     dict_rows = [
         {
             "término": "Riesgo esperado",
-            "definición": "Estimación orientativa de la probabilidad de que el prospecto genere eventos de salud o costes relevantes."
+            "definición": "Estimación orientativa de la probabilidad de que el prospecto genere eventos de salud o costes relevantes.",
         },
         {
             "término": "Uso sanitario esperado",
-            "definición": "Nivel probable de utilización de consultas, urgencias, farmacia u hospitalización."
+            "definición": "Nivel probable de utilización de consultas, urgencias, farmacia u hospitalización.",
         },
         {
             "término": "Coste anual estimado",
-            "definición": "Estimación aproximada del coste que este prospecto podría suponer para la aseguradora en un año."
+            "definición": "Estimación aproximada del coste que este prospecto podría suponer para la aseguradora en un año.",
         },
         {
             "término": "Prima mensual sugerida",
-            "definición": "Precio orientativo recomendado para sostener el riesgo esperado y el nivel de cobertura propuesto."
+            "definición": "Precio orientativo recomendado para sostener el riesgo esperado y el nivel de cobertura propuesto.",
         },
         {
             "término": "Margen técnico anual estimado",
-            "definición": "Diferencia aproximada entre la prima anual sugerida y el coste anual esperado."
+            "definición": "Diferencia aproximada entre la prima anual sugerida y el coste anual esperado.",
         },
         {
             "término": "Loss ratio esperado",
-            "definición": "Relación entre coste esperado y prima. Un valor más alto implica un negocio más ajustado para la aseguradora."
+            "definición": "Relación entre coste esperado y prima. Un valor más alto implica un negocio más ajustado para la aseguradora.",
         },
         {
             "término": "Plan recomendado",
-            "definición": "Tipología de póliza sugerida según el perfil clínico, de uso y de preferencia comercial del prospecto."
+            "definición": "Tipología de póliza sugerida según el perfil clínico, de uso y de preferencia comercial del prospecto.",
         },
         {
             "término": "Cobertura sugerida",
-            "definición": "Alcance recomendado de la cobertura: ambulatoria, hospitalaria o integral."
+            "definición": "Alcance recomendado de la cobertura: ambulatoria, hospitalaria o integral.",
         },
         {
             "término": "Nivel comercial",
-            "definición": "Nivel simplificado de oferta: Basic, Mid o Premium."
+            "definición": "Nivel simplificado de oferta: Basic, Mid o Premium.",
         },
         {
             "término": "Cohorte comparable",
-            "definición": "Grupo de prospectos del dataset con características similares usado como referencia para orientar la recomendación."
+            "definición": "Grupo de prospectos del dataset con características similares usado como referencia para orientar la recomendación.",
         },
     ]
 
