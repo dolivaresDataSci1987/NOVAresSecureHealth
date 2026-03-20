@@ -104,31 +104,52 @@ def segment_order_key(x):
     return order.get(x, 50)
 
 
-def build_bucket_distribution(series, n_bins=10):
-    s = pd.to_numeric(series, errors="coerce").dropna()
-    if s.empty:
-        return pd.DataFrame()
+def build_margin_business_buckets(series):
+    s = pd.to_numeric(series, errors="coerce")
 
-    min_v = float(s.min())
-    max_v = float(s.max())
+    bins = [-np.inf, -50000, -10000, -1000, 1000, 10000, 50000, np.inf]
+    labels = [
+        "Pérdida severa (< -50k)",
+        "Pérdida alta (-50k a -10k)",
+        "Pérdida moderada (-10k a -1k)",
+        "Equilibrio técnico (-1k a 1k)",
+        "Margen positivo bajo (1k a 10k)",
+        "Margen positivo medio (10k a 50k)",
+        "Margen positivo alto (> 50k)",
+    ]
 
-    if min_v == max_v:
-        return pd.DataFrame({"tramo": [f"{min_v:.2f}"], "casos": [len(s)]})
-
-    bins = np.linspace(min_v, max_v, n_bins + 1)
-    bucketed = pd.cut(s, bins=bins, include_lowest=True, duplicates="drop")
-    counts = bucketed.value_counts().sort_index()
-
-    out = counts.reset_index()
+    bucketed = pd.cut(s, bins=bins, labels=labels, include_lowest=True)
+    out = (
+        bucketed.value_counts(dropna=False)
+        .reindex(labels, fill_value=0)
+        .reset_index()
+    )
     out.columns = ["tramo", "casos"]
-    out["tramo"] = out["tramo"].astype(str)
     return out
 
 
-def safe_group_metric(df_grouped, col):
-    if col in df_grouped.columns:
-        return df_grouped[col]
-    return np.nan
+def build_ratio_business_buckets(series):
+    s = pd.to_numeric(series, errors="coerce")
+
+    bins = [-np.inf, 0.5, 0.8, 1.0, 1.2, 1.5, 2.0, np.inf]
+    labels = [
+        "Muy rentable (<= 0,5)",
+        "Rentable (0,5–0,8)",
+        "Ajustado (0,8–1,0)",
+        "Pérdida leve (1,0–1,2)",
+        "Pérdida moderada (1,2–1,5)",
+        "Pérdida alta (1,5–2,0)",
+        "Pérdida severa (> 2,0)",
+    ]
+
+    bucketed = pd.cut(s, bins=bins, labels=labels, include_lowest=True)
+    out = (
+        bucketed.value_counts(dropna=False)
+        .reindex(labels, fill_value=0)
+        .reset_index()
+    )
+    out.columns = ["tramo", "casos"]
+    return out
 
 
 # =========================================================
@@ -367,7 +388,8 @@ c1, c2 = st.columns(2)
 
 with c1:
     st.markdown("### Distribución del margen técnico")
-    margen_dist = build_bucket_distribution(df_filtered["margen_tecnico"], n_bins=12)
+    st.caption("Tramos de negocio para entender rápidamente dónde se concentra la pérdida o el margen.")
+    margen_dist = build_margin_business_buckets(df_filtered["margen_tecnico"])
     if not margen_dist.empty:
         st.bar_chart(margen_dist.set_index("tramo"))
         st.dataframe(margen_dist, use_container_width=True, hide_index=True)
@@ -376,7 +398,8 @@ with c1:
 
 with c2:
     st.markdown("### Distribución del ratio coste / prima")
-    ratio_dist = build_bucket_distribution(df_filtered["ratio_coste_prima"], n_bins=12)
+    st.caption("Valores por encima de 1 implican que el coste supera la prima y la aseguradora entra en pérdida.")
+    ratio_dist = build_ratio_business_buckets(df_filtered["ratio_coste_prima"])
     if not ratio_dist.empty:
         st.bar_chart(ratio_dist.set_index("tramo"))
         st.dataframe(ratio_dist, use_container_width=True, hide_index=True)
@@ -615,7 +638,7 @@ st.dataframe(
 
 
 # =========================================================
-# CONCENTRACIÓN DEL COSTE EN ALTO RIESGO
+# CONCENTRACIÓN DEL COSTE
 # =========================================================
 st.markdown("## Concentración del coste")
 
