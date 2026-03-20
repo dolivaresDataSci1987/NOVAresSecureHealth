@@ -373,7 +373,6 @@ with e1:
 
     risk_cost = safe_sum(df.loc[mask_risk], "approved_cost_sum")
     risk_loss_ratio = safe_mean(df.loc[mask_risk], "observed_loss_ratio")
-    risk_claims = safe_sum(df.loc[mask_risk], "claims_count")
 
     st.write(f"**Casos de riesgo alto / muy alto:** {fmt_int(high_risk_n)}")
     st.write(f"**% del portfolio:** {fmt_pct(get_pct(high_risk_n, total_cases))}")
@@ -497,6 +496,106 @@ if priority_table.empty:
     st.info("No hay datos suficientes para construir la tabla de casos prioritarios.")
 else:
     st.dataframe(priority_table, use_container_width=True, hide_index=True)
+
+# =========================================================
+# GLOSARIO DE TÉRMINOS
+# =========================================================
+st.markdown("## Glosario de términos")
+
+with st.expander("Abrir glosario y guía rápida de interpretación", expanded=False):
+    st.markdown(
+        """
+        Este glosario resume los conceptos principales utilizados en la Home para facilitar
+        una lectura ejecutiva y homogénea del dashboard.
+        """
+    )
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.markdown(
+            """
+            ### Cartera y estructura
+
+            **Miembro analizado:** persona asegurada incluida en el universo de análisis del dashboard.
+
+            **Póliza:** contrato o unidad de aseguramiento asociada al miembro y a sus coberturas.
+
+            **Plan / tipo de plan:** categoría comercial o técnica del producto asegurador contratado.
+
+            **Tier de plan:** nivel del plan dentro de una estructura escalonada, por ejemplo básico, intermedio o premium.
+
+            **Cobertura:** alcance de protección o paquete asistencial incluido en la póliza.
+
+            **Prestador:** proveedor sanitario, clínica, hospital, laboratorio o profesional que presta servicios cubiertos.
+
+            **Prospecto:** potencial asegurado aún no incorporado definitivamente a cartera.
+            """
+        )
+
+        st.markdown(
+            """
+            ### Economía y pricing
+
+            **Prima mensual:** importe mensual cobrado o estimado para la póliza.
+
+            **Prima anual:** equivalente anual de la prima del asegurado.
+
+            **Prima sugerida:** prima estimada por el modelo como más coherente con el perfil de riesgo y coste esperado.
+
+            **Brecha vs esperado:** diferencia entre la prima observada y la referencia esperada o técnica.
+
+            **Ratio de adecuación tarifaria:** indicador que compara la prima observada con la prima esperada.
+            Valores cercanos a 1 indican mejor alineación.
+
+            **Tensión de pricing:** situación en la que la prima actual parece desviarse de forma relevante respecto al nivel esperado.
+
+            **Coste aprobado:** gasto asistencial finalmente validado o aprobado para el caso o conjunto de claims.
+
+            **Siniestralidad observada:** relación entre coste y prima, utilizada para valorar sostenibilidad técnica de la cartera.
+            """
+        )
+
+    with c2:
+        st.markdown(
+            """
+            ### Riesgo
+
+            **Probabilidad de riesgo:** estimación del modelo sobre la probabilidad relativa de que un miembro genere mayor coste o complejidad.
+
+            **Segmento de riesgo:** clasificación del miembro en niveles de riesgo, por ejemplo muy bajo, medio o alto.
+
+            **Riesgo alto / muy alto:** subconjunto de miembros con mayor exposición esperada y, por tanto, mayor prioridad analítica.
+
+            **Caso prioritario:** registro que combina varias señales relevantes, como alto riesgo, tensión de pricing,
+            abuso elevado, exposición a prestadores marcados o cancelación.
+            """
+        )
+
+        st.markdown(
+            """
+            ### Abuso, fraude y operación
+
+            **Abuso:** utilización anómala o ineficiente del sistema que no necesariamente implica fraude intencional,
+            pero sí puede generar sobrecoste.
+
+            **Fraude:** comportamiento potencialmente irregular o deliberado orientado a obtener un beneficio indebido.
+
+            **Prestador marcado:** proveedor con señales analíticas de comportamiento anómalo o patrón potencialmente irregular.
+
+            **Claims:** eventos, actos asistenciales o solicitudes de reembolso / atención registrados en el sistema.
+
+            **Claims ligados a prestadores marcados:** volumen de actividad asistencial relacionado con proveedores señalados.
+
+            **Coste expuesto:** coste asociado a miembros o claims con señales de relación con red marcada o patrón sospechoso.
+
+            **Exposición a fraude / abuso:** presencia de indicadores que justifican seguimiento reforzado desde la óptica antifraude o de uso indebido.
+
+            **Cancelación:** indicador de baja, salida o interrupción de la continuidad de la póliza o relación aseguradora.
+
+            **Portfolio:** conjunto agregado de miembros, pólizas, costes, primas y señales analíticas evaluadas en el dashboard.
+            """
+        )
 
 # =========================================================
 # CONTEXTO DEL DATASET
