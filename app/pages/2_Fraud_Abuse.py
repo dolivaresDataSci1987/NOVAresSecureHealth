@@ -124,6 +124,60 @@ def build_score_buckets(series):
     out.columns = ["tramo", "casos"]
     return out
 
+def explain_abuse_reason(reason):
+    if pd.isna(reason):
+        return "Sin dato"
+
+    reason_str = str(reason).strip()
+    reason_key = reason_str.lower()
+
+    abuse_reason_dict = {
+        "high_claim_volume": "Volumen de reclamos anormalmente alto para el perfil del asegurado.",
+        "high_base_cost": "Coste sanitario base elevado frente a lo esperado para casos comparables.",
+        "flagged_provider_exposure": "Alta exposición a proveedores previamente marcados o sospechosos.",
+        "high_flagged_provider_cost": "Parte importante del coste proviene de proveedores marcados.",
+        "high_flagged_provider_use": "Uso frecuente de proveedores con señales de fraude o comportamiento anómalo.",
+        "cost_frequency_mismatch": "La combinación entre frecuencia de uso y coste total no parece consistente con un patrón normal.",
+        "high_cost_outlier": "Coste total claramente extremo respecto al resto de asegurados comparables.",
+        "high_claim_frequency": "Frecuencia de reclamos superior a la esperada.",
+        "repeat_flagged_provider_pattern": "Patrón repetido de utilización de proveedores marcados.",
+        "network_abuse_pattern": "Uso de la red asistencial con patrón potencialmente oportunista o abusivo.",
+        "provider_risk_exposure": "Elevada exposición a proveedores con mayor riesgo de fraude.",
+        "mixed_abuse_pattern": "Combinación de varias señales de abuso, sin depender de una sola causa.",
+        "high_utilization_pattern": "Uso intensivo de prestaciones o servicios por encima de lo habitual.",
+        "unusual_claim_pattern": "Patrón de reclamos atípico frente al comportamiento esperado.",
+        "chronic_overuse_pattern": "Uso excesivo recurrente no explicado solo por cronicidad.",
+        "high_cost_and_frequency": "Coinciden alta frecuencia de uso y alto coste, elevando la sospecha de abuso.",
+    }
+
+    return abuse_reason_dict.get(
+        reason_key,
+        f"Señal técnica detectada: {reason_str.replace('_', ' ')}."
+    )
+
+
+def explain_provider_reason(reason):
+    if pd.isna(reason):
+        return "Sin dato"
+
+    reason_str = str(reason).strip()
+    reason_key = reason_str.lower()
+
+    provider_reason_dict = {
+        "high_claim_volume": "Volumen de reclamos elevado para ese proveedor.",
+        "high_total_cost": "Coste total facturado anormalmente alto.",
+        "high_cost_per_claim": "Coste medio por reclamo superior a lo esperado.",
+        "billing_anomaly": "Posible anomalía en el patrón de facturación.",
+        "repeat_member_pattern": "Patrón repetitivo con determinados pacientes o asegurados.",
+        "suspicious_specialty_pattern": "Comportamiento atípico dentro de su especialidad.",
+        "high_flag_rate": "Acumula múltiples señales de alerta en el modelo.",
+        "mixed_fraud_pattern": "Combina varias señales de fraude o facturación anómala.",
+    }
+
+    return provider_reason_dict.get(
+        reason_key,
+        f"Señal técnica detectada: {reason_str.replace('_', ' ')}."
+    )
 
 # =========================================================
 # COLUMNAS DISPONIBLES
